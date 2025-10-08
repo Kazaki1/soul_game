@@ -34,7 +34,7 @@ namespace Pathfinding {
 		const double updateCheckRate = 1F;
 
 		/// <summary>URL to the version file containing the latest version number.</summary>
-		const string updateURL = "http://www.arongranberg.com/astar/version.php";
+		const string updateURL = "https://www.arongranberg.com/astar/version.php";
 
 		/// <summary>Last time an update check was made</summary>
 		public static System.DateTime lastUpdateCheck {
@@ -96,7 +96,7 @@ namespace Pathfinding {
 		/// This info can be updated when a check for new versions is done to ensure that there are no invalid links.
 		/// </summary>
 		static Dictionary<string, string> astarServerData = new Dictionary<string, string> {
-			{ "URL:modifiers", "http://www.arongranberg.com/astar/docs/modifiers.php" },
+			{ "URL:modifiers", "https://www.arongranberg.com/astar/docs/modifiers.php" },
 			{ "URL:astarpro", "http://arongranberg.com/unity/a-pathfinding/astarpro/" },
 			{ "URL:documentation", "http://arongranberg.com/astar/docs/" },
 			{ "URL:findoutmore", "http://arongranberg.com/astar" },

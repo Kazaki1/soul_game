@@ -126,7 +126,7 @@ public class PathfindingEnemy : MonoBehaviour
             }
             else if (!isPatrolling && !isReturning)
             {
-                rb.velocity = Vector2.zero;
+                rb.linearVelocity = Vector2.zero;
                 return;
             }
         }
@@ -169,7 +169,7 @@ public class PathfindingEnemy : MonoBehaviour
         if (currentWaypoint >= path.vectorPath.Count)
         {
             reachedEndOfPath = true;
-            rb.velocity = Vector2.zero;
+            rb.linearVelocity = Vector2.zero;
 
             patrolWaitTimer += Time.fixedDeltaTime;
             if (patrolWaitTimer >= patrolWaitTime)
@@ -212,7 +212,7 @@ public class PathfindingEnemy : MonoBehaviour
         float distanceToStart = Vector2.Distance(rb.position, startPosition);
         if (distanceToStart < nextWaypointDistance)
         {
-            rb.velocity = Vector2.zero;
+            rb.linearVelocity = Vector2.zero;
             isReturning = false;
             return;
         }
@@ -220,7 +220,7 @@ public class PathfindingEnemy : MonoBehaviour
         if (currentWaypoint >= path.vectorPath.Count)
         {
             reachedEndOfPath = true;
-            rb.velocity = Vector2.zero;
+            rb.linearVelocity = Vector2.zero;
             return;
         }
         else

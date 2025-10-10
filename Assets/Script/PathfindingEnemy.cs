@@ -12,25 +12,25 @@ public class PathfindingEnemy : MonoBehaviour
     public float speed = 200f;
     public float nextWaypointDistance = 3f;
     public float chaseRange = 20f;
-    public LayerMask obstacleMask;
+    public LayerMask obstacleMask;   
 
     [Header("Patrol Settings")]
-    public float patrolRadius = 10f;
-    public float patrolWaitTime = 2f;
-    public float patrolDuration = 10f;
+    public float patrolRadius = 10f;  
+    public float patrolWaitTime = 2f; 
+    public float patrolDuration = 10f; 
 
     private Path path;
     private int currentWaypoint = 0;
     private bool reachedEndOfPath = false;
-    private bool isChasing = false;
-    private bool isPatrolling = false;
+    private bool isChasing = false; 
+    private bool isPatrolling = false; 
     private bool isReturning = false;
 
     private Vector2 startPosition;
-    private Vector2 lastKnownPosition;
-    private Vector2 currentPatrolTarget;
+    private Vector2 lastKnownPosition; 
+    private Vector2 currentPatrolTarget; 
     private float patrolWaitTimer = 0f;
-    private float totalPatrolTime = 0f;
+    private float totalPatrolTime = 0f; 
 
     private Seeker seeker;
     private Rigidbody2D rb;
@@ -39,7 +39,7 @@ public class PathfindingEnemy : MonoBehaviour
     {
         seeker = GetComponent<Seeker>();
         rb = GetComponent<Rigidbody2D>();
-        startPosition = rb.position;
+        startPosition = rb.position; 
         InvokeRepeating("UpdatePath", 0f, 0.5f);
     }
 
@@ -117,7 +117,7 @@ public class PathfindingEnemy : MonoBehaviour
         {
             Vector2 dirToPlayer = (player.position - transform.position).normalized;
             RaycastHit2D hit = Physics2D.Raycast(transform.position, dirToPlayer, chaseRange, obstacleMask);
-
+    
             if (hit.collider != null && hit.collider.CompareTag("Player"))
             {
                 isChasing = true;
@@ -126,7 +126,7 @@ public class PathfindingEnemy : MonoBehaviour
             }
             else if (!isPatrolling && !isReturning)
             {
-                rb.velocity = Vector2.zero;
+                rb.linearVelocity = Vector2.zero;
                 return;
             }
         }
@@ -169,7 +169,7 @@ public class PathfindingEnemy : MonoBehaviour
         if (currentWaypoint >= path.vectorPath.Count)
         {
             reachedEndOfPath = true;
-            rb.velocity = Vector2.zero;
+            rb.linearVelocity = Vector2.zero;
 
             patrolWaitTimer += Time.fixedDeltaTime;
             if (patrolWaitTimer >= patrolWaitTime)
@@ -212,7 +212,7 @@ public class PathfindingEnemy : MonoBehaviour
         float distanceToStart = Vector2.Distance(rb.position, startPosition);
         if (distanceToStart < nextWaypointDistance)
         {
-            rb.velocity = Vector2.zero;
+            rb.linearVelocity = Vector2.zero;
             isReturning = false;
             return;
         }
@@ -220,7 +220,7 @@ public class PathfindingEnemy : MonoBehaviour
         if (currentWaypoint >= path.vectorPath.Count)
         {
             reachedEndOfPath = true;
-            rb.velocity = Vector2.zero;
+            rb.linearVelocity = Vector2.zero;
             return;
         }
         else

@@ -46,7 +46,7 @@ public class EnemyAttack1 : MonoBehaviour
         Vector2 direction = (player.position - transform.position).normalized;
 
         // Reset vận tốc trước khi AddForce để nhảy ổn định
-        rb.velocity = Vector2.zero;
+        rb.linearVelocity = Vector2.zero;
 
         // Nhảy bật về phía player
         rb.AddForce(direction * jumpForce, ForceMode2D.Impulse);

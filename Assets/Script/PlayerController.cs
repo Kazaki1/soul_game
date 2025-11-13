@@ -43,7 +43,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            speed = 5f;
+            speed = 20f;
             sprint_check = false;
             walk_check = true;
         }

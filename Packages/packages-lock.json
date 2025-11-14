@@ -154,6 +154,7 @@
     },
     "com.unity.burst": {
       "version": "1.8.25",
+
       "depth": 1,
       "source": "registry",
       "dependencies": {

@@ -21,7 +21,6 @@ public class Stamina : MonoBehaviour
         PlayerController playerController = FindObjectOfType<PlayerController>();
         float previousStamina = currentStamina;
 
-        // Hành động làm giảm stamina (sẽ thêm trong tưong lai)
         if (PlayerController.sprint_check == true)
         {
             if (currentStamina > 0)

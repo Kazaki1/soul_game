@@ -12,6 +12,10 @@ public class PlayerAttack : MonoBehaviour
     private Animator anim;
     private PlayerController playerController;
 
+    public Vector2 meleeUpOffset;
+    public Vector2 meleeDownOffset;
+    public Vector2 meleeLeftOffset;
+    public Vector2 meleeRightOffset;
     void Start()
     {
         anim = GetComponent<Animator>();
@@ -51,13 +55,26 @@ public class PlayerAttack : MonoBehaviour
 
             if (playerController != null)
             {
-                Vector2 dir = playerController.GetLastMoveDirection();
+                Vector2 dir = SnapDirectionTo4Way(playerController.GetLastMoveDirection());
+                UpdateMeleePosition(dir);
                 anim.SetFloat("AttackX", dir.x);
                 anim.SetFloat("AttackY", dir.y);
             }
         }
+
     }
 
+    void UpdateMeleePosition(Vector2 dir)
+    {
+        if (dir.y > 0.1f)         
+            Melee.transform.localPosition = meleeUpOffset;
+        else if (dir.y < -0.1f)   
+            Melee.transform.localPosition = meleeDownOffset;
+        else if (dir.x > 0.1f)    
+            Melee.transform.localPosition = meleeRightOffset;
+        else if (dir.x < -0.1f)   
+            Melee.transform.localPosition = meleeLeftOffset;
+    }
     public void EnableMelee()
     {
         if (Melee != null)
@@ -68,5 +85,16 @@ public class PlayerAttack : MonoBehaviour
     {
         if (Melee != null)
             Melee.SetActive(false);
+    }
+    Vector2 SnapDirectionTo4Way(Vector2 dir)
+    {
+        if (Mathf.Abs(dir.x) > Mathf.Abs(dir.y))
+        {
+            return new Vector2(dir.x > 0 ? 1 : -1, 0);
+        }
+        else
+        {
+            return new Vector2(0, dir.y > 0 ? 1 : -1);
+        }
     }
 }

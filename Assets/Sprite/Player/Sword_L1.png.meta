@@ -1,10 +1,13 @@
 fileFormatVersion: 2
-guid: 82121a002a6188a44af459f06811ac2a
+guid: a94032fadcf43eb4699d7032bb271f55
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 7980841460449642584
-    second: player3 2_0
+      213: -938439998876420641
+    second: Sword_L1_0
+  - first:
+      213: -6111082966299963546
+    second: Sword_L1_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,23 +103,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: player3 2_0
+      name: Sword_L1_0
       rect:
         serializedVersion: 2
-        x: 1
-        y: 47
-        width: 16
-        height: 17
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 38
+        y: 32
+        width: 31
+        height: 24
+      alignment: 9
+      pivot: {x: 0.7213078, y: 0.27628645}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 8588fc22605a1ce60800000000000000
-      internalID: 7980841460449642584
+      spriteID: fd5f3f70bcdf9f2f0800000000000000
+      internalID: -938439998876420641
       vertices: []
       indices: 
       edges: []
@@ -125,7 +128,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: cc4263c4c5ca01b4fb1215c490210f5b
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +138,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      player3 2_0: 7980841460449642584
+      Sword_L1_0: -938439998876420641
+      Sword_L1_1: -6111082966299963546
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

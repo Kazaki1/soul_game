@@ -23,6 +23,10 @@ public class PlayerController : MonoBehaviour
     private Vector2 lastMoveDirection;
     bool isMoving = false;
 
+    float dough_speed = 10f;
+    float dough_duration = 1f;
+    float dough_cooldown = 1f;
+
     void Update()
     {
         HandleInput();
@@ -97,10 +101,6 @@ public class PlayerController : MonoBehaviour
         return lastMoveDirection;
     }
 
-    void Doughing()
-    {
-
-    }
 
     void Animate()
     {

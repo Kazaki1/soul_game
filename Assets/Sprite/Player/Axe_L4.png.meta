@@ -1,10 +1,13 @@
 fileFormatVersion: 2
-guid: 82121a002a6188a44af459f06811ac2a
+guid: b57a7d76c483cc64cab22d587e6641ac
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 7980841460449642584
-    second: player3 2_0
+      213: -4616079035196086129
+    second: combat_stand8_0
+  - first:
+      213: -6141131418017313407
+    second: combat_stand8_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,23 +103,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: player3 2_0
+      name: combat_stand8_0
       rect:
         serializedVersion: 2
-        x: 1
-        y: 47
-        width: 16
-        height: 17
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 42
+        y: 9
+        width: 32
+        height: 49
+      alignment: 9
+      pivot: {x: 0.7174995, y: 0.81451803}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 8588fc22605a1ce60800000000000000
-      internalID: 7980841460449642584
+      spriteID: f886204139460ffb0800000000000000
+      internalID: -4616079035196086129
       vertices: []
       indices: 
       edges: []
@@ -125,7 +128,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 12e2a99a240ee14468b16abc21f0ee4b
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +138,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      player3 2_0: 7980841460449642584
+      combat_stand8_0: -4616079035196086129
+      combat_stand8_1: -6141131418017313407
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

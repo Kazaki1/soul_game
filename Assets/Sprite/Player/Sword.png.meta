@@ -103,10 +103,10 @@ TextureImporter:
       name: Sword_0
       rect:
         serializedVersion: 2
-        x: 11
-        y: 0
-        width: 10
-        height: 32
+        x: 18
+        y: 2
+        width: 28
+        height: 76
       alignment: 9
       pivot: {x: 0.5000002, y: 0.115958326}
       border: {x: 0, y: 0, z: 0, w: 0}

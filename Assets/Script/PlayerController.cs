@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
@@ -13,38 +14,47 @@ public class PlayerController : MonoBehaviour
 
     public float decreaseAmount;
 
-    public int maxHealth = 100;
-    public int currentHealth;
-
-    public HealthBar healthBar;
     public Animator anim;
 
     public Transform Aim;
     private Vector2 lastMoveDirection;
-    bool isMoving = false;
+    private bool isMoving = false;
 
-    float dough_speed = 10f;
-    float dough_duration = 1f;
-    float dough_cooldown = 1f;
+    public float dough_speed = 10f;
+    public float dough_duration = 1f;
+    public float dough_cooldown = 1f;
+    public float doughStaminaCost = 20f;
+    bool isDoughing = false;
+    bool canDough = true;
+    bool isInvincible = false;
 
+    private void Start()
+    {
+        canDough = true;
+    }
     void Update()
     {
+        if (isDoughing)
+        {
+            return;
+        }
         HandleInput();
         Animate();
-    }
 
+    }
     void FixedUpdate()
     {
-        Move();
-        Sprint();
-
-        if (isMoving)
+        if (!isDoughing)
         {
-            Vector3 vector3 = Vector3.left * lastMoveDirection.x + Vector3.down * lastMoveDirection.y;
-            Aim.rotation = Quaternion.LookRotation(Vector3.forward, vector3);
+            Move();
+            Sprint();
         }
-    }
+        if (isDoughing)
+        {
+            return;
+        }
 
+    }
     void HandleInput()
     {
         float moveX = Input.GetAxisRaw("Horizontal");
@@ -69,11 +79,18 @@ public class PlayerController : MonoBehaviour
         {
             lastMoveDirection = moveDirection;
         }
+        if (Input.GetKeyDown(KeyCode.Space) && canDough)
+        {
+            StartCoroutine(Doughing());
+        }
 
     }
 
     void Move()
     {
+        if (isDoughing)
+            return;
+
         rb.linearVelocity = new Vector2(moveDirection.x * speed, moveDirection.y * speed);
     }
 
@@ -112,21 +129,28 @@ public class PlayerController : MonoBehaviour
         anim.SetFloat("AnimLastMoveY", lastMoveDirection.y);
     }
 
-    public void TakeDamage(int damage)
+    private IEnumerator Doughing()
     {
-        currentHealth -= damage;
-        healthBar.SetHealth(currentHealth);
+        Stamina stamina = FindObjectOfType<Stamina>();
 
-        if (currentHealth <= 0)
-        {
-            Die();
-        }
+        if (stamina != null)
+            stamina.currentStamina -= doughStaminaCost;
+
+        canDough = false;      // này là cooldown
+        isInvincible = true;
+        isDoughing = true;
+        Vector2 dashDir = moveDirection != Vector2.zero ?
+                          moveDirection :
+                          lastMoveDirection;
+        rb.linearVelocity = dashDir * dough_speed;
+
+        yield return new WaitForSeconds(dough_duration);
+
+        isDoughing = false;
+        isInvincible = false;
+
+        yield return new WaitForSeconds(dough_cooldown);
+        canDough = true;
     }
 
-
-    void Die()
-    {
-        Debug.Log("Player Died!");
-        // Thêm logic chết ở đây (ví dụ: reload scene, hiển thị menu game over, v.v.)
-    }
 }

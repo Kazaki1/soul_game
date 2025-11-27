@@ -181,12 +181,15 @@ public class PlayerAttack : MonoBehaviour
             }
 
             // Debug info
+            float loadPercentage = 0f;
             if (playerCapacity != null)
             {
-                float loadPercentage = weaponController.GetLoadPercentage();
-                string sanityInfo = sanityCost > 0f ? $" | Sanity Cost: {sanityCost:F1}" : "";
-                Debug.Log($"⚔️ Attack | WeaponType: {weaponType} | Load: {loadPercentage:F1}% | Modifier: {loadModifier:F2}x | Cooldown: {finalCooldown:F2}s | Stamina Cost: {finalCost}{sanityInfo}");
+                float currentLoad = playerCapacity.GetCurrentLoad();
+                float maxLoad = playerCapacity.GetMaxEquipLoad();
+                loadPercentage = (currentLoad / maxLoad) * 100f;
             }
+            string sanityInfo = sanityCost > 0f ? $" | Sanity Cost: {sanityCost:F1}" : "";
+            Debug.Log($"⚔️ Attack | WeaponType: {weaponType} | Load: {loadPercentage:F1}% | Modifier: {loadModifier:F2}x | Cooldown: {finalCooldown:F2}s | Stamina Cost: {finalCost}{sanityInfo}");
         }
     }
 
@@ -195,9 +198,11 @@ public class PlayerAttack : MonoBehaviour
     /// </summary>
     private float GetEquipLoadModifier()
     {
-        if (weaponController == null) return 1.0f;
+        if (playerCapacity == null) return 1.0f;
 
-        float loadPercentage = weaponController.GetLoadPercentage();
+        float currentLoad = playerCapacity.GetCurrentLoad();
+        float maxLoad = playerCapacity.GetMaxEquipLoad();
+        float loadPercentage = (currentLoad / maxLoad) * 100f;
 
         if (loadPercentage < 50f)
             return 0.9f;
@@ -298,8 +303,11 @@ public class PlayerAttack : MonoBehaviour
 
     public string GetEquipLoadTier()
     {
-        if (weaponController == null) return "Unknown";
-        float loadPercentage = weaponController.GetLoadPercentage();
+        if (playerCapacity == null) return "Unknown";
+
+        float currentLoad = playerCapacity.GetCurrentLoad();
+        float maxLoad = playerCapacity.GetMaxEquipLoad();
+        float loadPercentage = (currentLoad / maxLoad) * 100f;
 
         if (loadPercentage < 50f)
             return "Light Load (-10% cost/cooldown)";

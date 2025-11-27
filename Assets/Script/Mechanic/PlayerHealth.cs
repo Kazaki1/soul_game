@@ -11,10 +11,17 @@ public class PlayerHealth : MonoBehaviour
     public HealthBar healthBar;
 
     private PlayerStats stats;
+    private ItemController itemController; // Thêm reference đến ItemController
 
     private void Awake()
     {
         stats = GetComponent<PlayerStats>();
+        itemController = GetComponent<ItemController>(); // Thêm để lấy buffs
+
+        if (itemController == null)
+        {
+            Debug.LogWarning("ItemController không tìm thấy! Không có health buff.");
+        }
     }
 
     private void Start()
@@ -30,7 +37,17 @@ public class PlayerHealth : MonoBehaviour
             return;
         }
 
-        maxHealth = CalculateHealthFromVigor(stats.vigor);
+        int baseMaxHealth = CalculateHealthFromVigor(stats.vigor);
+
+        // Áp dụng health buff từ items
+        float buffMultiplier = 1f;
+        if (itemController != null)
+        {
+            float buffPercent = itemController.GetTotalHealthBuffPercent();
+            buffMultiplier += buffPercent / 100f;
+        }
+
+        maxHealth = Mathf.RoundToInt(baseMaxHealth * buffMultiplier);
 
         if (fullHeal)
             currentHealth = maxHealth;
@@ -42,6 +59,8 @@ public class PlayerHealth : MonoBehaviour
             healthBar.SetMaxHealth(maxHealth);
             healthBar.SetHealth(currentHealth);
         }
+
+        Debug.Log($"Updated Max Health: {maxHealth} (Base: {baseMaxHealth} | Buff Multiplier: {buffMultiplier:F2})");
     }
 
     public int CalculateHealthFromVigor(int vigor)

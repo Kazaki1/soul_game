@@ -7,17 +7,24 @@ public class Melee : MonoBehaviour
 
     private Transform player;
     private PlayerWeaponController weaponController;
+    private ItemController itemController; // Thêm reference đến ItemController
 
     private void Start()
     {
         player = transform.root;
 
-        // Lấy PlayerWeaponController từ root (Player)
+        // Lấy PlayerWeaponController và ItemController từ root (Player)
         weaponController = player.GetComponent<PlayerWeaponController>();
+        itemController = player.GetComponent<ItemController>();
 
         if (weaponController == null)
         {
             Debug.LogError("PlayerWeaponController không tìm thấy trên Player!");
+        }
+
+        if (itemController == null)
+        {
+            Debug.LogWarning("ItemController không tìm thấy trên Player! Không có buff item.");
         }
     }
 
@@ -48,8 +55,7 @@ public class Melee : MonoBehaviour
     }
 
     /// <summary>
-    /// Tính final damage
-    /// Hiện tại chỉ lấy weapon damage, sau này có thể thêm buffs, crits, etc.
+    /// Tính final damage với buff từ items
     /// </summary>
     private float CalculateFinalDamage()
     {
@@ -61,13 +67,17 @@ public class Melee : MonoBehaviour
 
         float weaponDamage = weaponController.GetWeaponDamage();
 
-        Debug.Log($"[MELEE] Weapon Damage: {weaponDamage:F1}");
+        // Áp dụng damage buff từ items
+        float buffMultiplier = 1f;
+        if (itemController != null)
+        {
+            float buffPercent = itemController.GetTotalDamageBuffPercent();
+            buffMultiplier += buffPercent / 100f;
+        }
 
-        // TODO: Thêm các modifier khác ở đây
-        // float critMultiplier = IsCriticalHit() ? 2f : 1f;
-        // float buffBonus = GetBuffDamage();
-        // float finalDamage = weaponDamage * critMultiplier + buffBonus;
+        float finalDamage = weaponDamage * buffMultiplier;
 
-        return weaponDamage;
+        Debug.Log($"[MELEE] Weapon Damage: {weaponDamage:F1} | Buff Multiplier: {buffMultiplier:F2} | Final: {finalDamage:F1}");
+        return finalDamage;
     }
 }

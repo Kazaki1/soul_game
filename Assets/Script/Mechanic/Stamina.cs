@@ -22,15 +22,29 @@ public class Stamina : MonoBehaviour
 
     private PlayerStats stats;
     private PlayerWeaponController weaponController;
+    private PlayerCapacity playerCapacity;
+    private ItemController itemController; // Thêm reference đến ItemController
 
     private void Awake()
     {
         stats = GetComponent<PlayerStats>();
         weaponController = GetComponent<PlayerWeaponController>();
+        playerCapacity = GetComponent<PlayerCapacity>();
+        itemController = GetComponent<ItemController>(); // Thêm để lấy buffs
 
         if (weaponController == null)
         {
             Debug.LogWarning("⚠️ PlayerWeaponController not found! Load system won't affect stamina regen.");
+        }
+
+        if (playerCapacity == null)
+        {
+            Debug.LogWarning("⚠️ PlayerCapacity not found! Load system won't affect stamina regen.");
+        }
+
+        if (itemController == null)
+        {
+            Debug.LogWarning("⚠️ ItemController not found! Không có stamina buff.");
         }
     }
 
@@ -110,9 +124,11 @@ public class Stamina : MonoBehaviour
     /// </summary>
     private float GetEquipLoadModifier()
     {
-        if (weaponController == null) return 1.0f;
+        if (playerCapacity == null) return 1.0f;
 
-        float loadPercentage = weaponController.GetLoadPercentage();
+        float currentLoad = playerCapacity.GetCurrentLoad();
+        float maxLoad = playerCapacity.GetMaxEquipLoad();
+        float loadPercentage = (currentLoad / maxLoad) * 100f;
 
         if (loadPercentage < 50f)
         {
@@ -141,9 +157,11 @@ public class Stamina : MonoBehaviour
     /// </summary>
     public string GetStaminaRegenTier()
     {
-        if (weaponController == null) return "Unknown";
+        if (playerCapacity == null) return "Unknown";
 
-        float loadPercentage = weaponController.GetLoadPercentage();
+        float currentLoad = playerCapacity.GetCurrentLoad();
+        float maxLoad = playerCapacity.GetMaxEquipLoad();
+        float loadPercentage = (currentLoad / maxLoad) * 100f;
 
         if (loadPercentage < 50f)
             return "Light Load (Regen +10% faster)";
@@ -167,7 +185,17 @@ public class Stamina : MonoBehaviour
     {
         if (stats == null) return;
 
-        maxStamina = CalculateStaminaFromEndurance(stats.endurance);
+        int baseMaxStamina = CalculateStaminaFromEndurance(stats.endurance);
+
+        // Áp dụng stamina buff từ items
+        float buffMultiplier = 1f;
+        if (itemController != null)
+        {
+            float buffPercent = itemController.GetTotalStaminaBuffPercent();
+            buffMultiplier += buffPercent / 100f;
+        }
+
+        maxStamina = Mathf.RoundToInt(baseMaxStamina * buffMultiplier);
 
         int bonusStamina = maxStamina - baseStamina;
         autoFillTime = baseAutoFillTime + (bonusStamina * autoFillTimePerStamina);
@@ -186,7 +214,7 @@ public class Stamina : MonoBehaviour
         // Debug info
         float modifiedTime = GetModifiedAutoFillTime();
         float regenRate = maxStamina / modifiedTime;
-        Debug.Log($"💚 Stamina Regen | Base Time: {autoFillTime:F2}s | Modified: {modifiedTime:F2}s | Rate: {regenRate:F1}/s");
+        Debug.Log($"💚 Stamina Regen | Base Time: {autoFillTime:F2}s | Modified: {modifiedTime:F2}s | Rate: {regenRate:F1}/s | Buff Multiplier: {buffMultiplier:F2}");
     }
 
     public int CalculateStaminaFromEndurance(int end)

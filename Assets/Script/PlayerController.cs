@@ -38,14 +38,28 @@ public class PlayerController : MonoBehaviour
     bool isInvincible = false;
 
     private PlayerWeaponController weaponController;
+    private PlayerCapacity playerCapacity;
+    private ItemController itemController; // Thêm reference đến ItemController
 
     private void Awake()
     {
         weaponController = GetComponent<PlayerWeaponController>();
+        playerCapacity = GetComponent<PlayerCapacity>();
+        itemController = GetComponent<ItemController>(); // Thêm để lấy buffs
 
         if (weaponController == null)
         {
             Debug.LogWarning("⚠️ PlayerWeaponController not found! Load system won't affect movement.");
+        }
+
+        if (playerCapacity == null)
+        {
+            Debug.LogWarning("⚠️ PlayerCapacity not found! Load system won't affect movement.");
+        }
+
+        if (itemController == null)
+        {
+            Debug.LogWarning("⚠️ ItemController not found! Không có buff item cho movement.");
         }
     }
 
@@ -186,15 +200,23 @@ public class PlayerController : MonoBehaviour
     }
 
     /// <summary>
-    /// Cập nhật tất cả movement stats dựa trên Equipment Load
+    /// Cập nhật tất cả movement stats dựa trên Equipment Load và buffs
     /// </summary>
     public void UpdateMovementStats()
     {
         EquipLoadModifiers modifiers = GetEquipLoadModifiers();
 
+        // Áp dụng dodge speed buff từ items
+        float dodgeBuffMultiplier = 1f;
+        if (itemController != null)
+        {
+            float buffPercent = itemController.GetTotalDodgeSpeedBuffPercent();
+            dodgeBuffMultiplier += buffPercent / 100f;
+        }
+
         speed = baseSpeed * modifiers.speedMultiplier;
         sprint_speed = baseSprintSpeed * modifiers.sprintSpeedMultiplier;
-        dough_speed = baseDoughSpeed * modifiers.doughSpeedMultiplier;
+        dough_speed = baseDoughSpeed * modifiers.doughSpeedMultiplier * dodgeBuffMultiplier;
         dough_duration = baseDoughDuration * modifiers.doughDurationMultiplier;
         doughStaminaCost = baseDoughStaminaCost * modifiers.doughCostMultiplier;
     }
@@ -204,10 +226,12 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private EquipLoadModifiers GetEquipLoadModifiers()
     {
-        if (weaponController == null)
+        if (playerCapacity == null)
             return new EquipLoadModifiers(); // Return default (1.0x tất cả)
 
-        float loadPercentage = weaponController.GetLoadPercentage();
+        float currentLoad = playerCapacity.GetCurrentLoad();
+        float maxLoad = playerCapacity.GetMaxEquipLoad();
+        float loadPercentage = (currentLoad / maxLoad) * 100f;
 
         if (loadPercentage < 50f)
         {
@@ -225,11 +249,11 @@ public class PlayerController : MonoBehaviour
         {
             return new EquipLoadModifiers
             {
-                speedMultiplier = 1f,        
-                sprintSpeedMultiplier = 1f,    
-                doughSpeedMultiplier = 1f,    
-                doughDurationMultiplier = 1f,  
-                doughCostMultiplier = 1f       
+                speedMultiplier = 1f,
+                sprintSpeedMultiplier = 1f,
+                doughSpeedMultiplier = 1f,
+                doughDurationMultiplier = 1f,
+                doughCostMultiplier = 1f
             };
         }
         else if (loadPercentage < 100f)
@@ -274,9 +298,11 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     public string GetMovementLoadTier()
     {
-        if (weaponController == null) return "Unknown";
+        if (playerCapacity == null) return "Unknown";
 
-        float loadPercentage = weaponController.GetLoadPercentage();
+        float currentLoad = playerCapacity.GetCurrentLoad();
+        float maxLoad = playerCapacity.GetMaxEquipLoad();
+        float loadPercentage = (currentLoad / maxLoad) * 100f;
 
         if (loadPercentage < 50f)
             return "Light Load (Fast Roll)";

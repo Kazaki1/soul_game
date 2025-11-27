@@ -10,11 +10,15 @@ public class EnemyDamageDeal : MonoBehaviour
     [SerializeField] private int lastCalculatedDamage;
     [SerializeField] private int lastBaseDamage;
     [SerializeField] private int lastPercentageDamage;
+    [SerializeField] private float lastPlayerDefense;
+    [SerializeField] private int lastFinalDamage;
 
     /// <summary>
-    /// Tính toán damage dựa trên: Base Damage + % Player Max HP
+    /// Tính toán damage dựa trên: (Base Damage + % Player Max HP) - Defense Reduction
+    /// Formula: total_damage = totalDamage - (totalDamage * (PlayerDefend/20) / 100)
+    /// 20 Defense = 1% reduction
     /// </summary>
-    public int CalculateDamage(PlayerHealth playerHealth)
+    public int CalculateDamage(PlayerHealth playerHealth, PlayerDefend playerDefend = null)
     {
         if (playerHealth == null)
         {
@@ -28,17 +32,40 @@ public class EnemyDamageDeal : MonoBehaviour
         // Tính % damage
         int percentageDamage = Mathf.RoundToInt(playerMaxHP * playerHpPercentage);
 
-        // Tổng damage
+        // Tổng damage trước khi trừ defense
         int totalDamage = baseDamage + percentageDamage;
+
+        // Áp dụng defense reduction
+        int finalDamage = totalDamage;
+        float defenseValue = 0f;
+
+        if (playerDefend != null)
+        {
+            defenseValue = playerDefend.CalculateDefense();
+
+            // Formula: Reduction% = (PlayerDefend / 20) / 100
+            // Example: 20 Defense = (20/20)/100 = 0.01 = 1%
+            //          40 Defense = (40/20)/100 = 0.02 = 2%
+            //          100 Defense = (100/20)/100 = 0.05 = 5%
+            float reductionPercentage = (defenseValue / 20f) / 100f;
+            float damageReduction = totalDamage * reductionPercentage;
+            finalDamage = Mathf.CeilToInt(totalDamage - damageReduction);
+
+            // Đảm bảo damage tối thiểu là 1
+            finalDamage = Mathf.Max(1, finalDamage);
+        }
 
         // Cache để debug
         lastBaseDamage = baseDamage;
         lastPercentageDamage = percentageDamage;
         lastCalculatedDamage = totalDamage;
+        lastPlayerDefense = defenseValue;
+        lastFinalDamage = finalDamage;
 
-        Debug.Log($"⚔️ Enemy Damage: {totalDamage} (Base: {baseDamage} + {playerHpPercentage * 100}% of {playerMaxHP} = {percentageDamage})");
+        float reductionPercent = (defenseValue / 20f);
+        Debug.Log($"⚔️ Enemy Damage: {totalDamage} - Defense: {defenseValue:F1} ({reductionPercent:F2}%) → Final: {finalDamage}");
 
-        return totalDamage;
+        return finalDamage;
     }
 
     /// <summary>
@@ -48,7 +75,10 @@ public class EnemyDamageDeal : MonoBehaviour
     {
         if (playerHealth == null) return;
 
-        int damage = CalculateDamage(playerHealth);
+        // Lấy PlayerDefend component
+        PlayerDefend playerDefend = playerHealth.GetComponent<PlayerDefend>();
+
+        int damage = CalculateDamage(playerHealth, playerDefend);
         playerHealth.TakeDamage(damage);
     }
 
@@ -71,6 +101,7 @@ public class EnemyDamageDeal : MonoBehaviour
     public int GetBaseDamage() => baseDamage;
     public float GetPlayerHpPercentage() => playerHpPercentage;
     public int GetLastCalculatedDamage() => lastCalculatedDamage;
+    public int GetLastFinalDamage() => lastFinalDamage;
 
     // Setters
     public void SetBaseDamage(int value) => baseDamage = Mathf.Max(0, value);
@@ -83,14 +114,20 @@ public class EnemyDamageDeal : MonoBehaviour
     {
         if (playerHealth == null) return;
 
-        int damage = CalculateDamage(playerHealth);
+        PlayerDefend playerDefend = playerHealth.GetComponent<PlayerDefend>();
+        int damage = CalculateDamage(playerHealth, playerDefend);
+
+        float reductionPercent = (lastPlayerDefense / 20f);
 
         Debug.Log("========== ENEMY DAMAGE INFO ==========");
         Debug.Log($"Base Damage: {baseDamage}");
         Debug.Log($"HP% Scaling: {playerHpPercentage * 100}%");
         Debug.Log($"Player Max HP: {playerHealth.GetMaxHealth()}");
         Debug.Log($"Percentage Damage: {lastPercentageDamage}");
-        Debug.Log($"Total Damage: {damage}");
+        Debug.Log($"Raw Damage: {lastCalculatedDamage}");
+        Debug.Log($"Player Defense: {lastPlayerDefense:F1}");
+        Debug.Log($"Damage Reduction: {reductionPercent:F2}% ({lastCalculatedDamage * (lastPlayerDefense / 20f) / 100f:F1} damage)");
+        Debug.Log($"FINAL DAMAGE: {damage}");
         Debug.Log("=======================================");
     }
 }

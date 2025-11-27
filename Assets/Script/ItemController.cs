@@ -18,7 +18,6 @@ public class ItemController : MonoBehaviour
     private float cachedTotalWeight = 0f;
 
     private PlayerCapacity playerCapacity;
-
     private void Awake()
     {
         playerCapacity = GetComponent<PlayerCapacity>();
@@ -27,8 +26,16 @@ public class ItemController : MonoBehaviour
         {
             Debug.LogWarning("PlayerCapacity component not found!");
         }
-    }
 
+        // Move loading here
+        for (int i = 0; i < 3; i++)
+        {
+            if (equippedItems[i] != null)
+            {
+                LoadItem(i);
+            }
+        }
+    }
     private void Start()
     {
         for (int i = 0; i < 3; i++)
@@ -79,7 +86,7 @@ public class ItemController : MonoBehaviour
 
         for (int i = 0; i < 3; i++)
         {
-            if (equippedItems[i] != null)
+            if (equippedItems[i] != null && itemStats[i] != null) // Thêm kiểm tra itemStats[i] != null
             {
                 cachedTotalWeight += itemStats[i].GetItemWeight();
 
@@ -101,7 +108,6 @@ public class ItemController : MonoBehaviour
             }
         }
     }
-
     /// <summary>
     /// Equip item mới vào slot cụ thể
     /// </summary>

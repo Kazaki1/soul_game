@@ -5,7 +5,6 @@ public class PlayerAttack : MonoBehaviour
     [Header("Hitboxes cho từng Weapon Type")]
     public GameObject[] weaponHitboxes; // Index = WeaponType
 
-
     [Header("Default Values (nếu chưa equip weapon)")]
     public float defaultAttackCooldown = 0.5f;
     public int defaultStaminaCost = 10;
@@ -19,6 +18,8 @@ public class PlayerAttack : MonoBehaviour
     private Stamina stamina;
     private PlayerWeaponController weaponController;
     private PlayerCapacity playerCapacity;
+    private Sanity sanity;
+    private SanityConsumption sanityConsumption;
 
     // Offset cho từng weapon type và hướng
     [System.Serializable]
@@ -41,6 +42,8 @@ public class PlayerAttack : MonoBehaviour
         stamina = GetComponent<Stamina>();
         weaponController = GetComponent<PlayerWeaponController>();
         playerCapacity = GetComponent<PlayerCapacity>();
+        sanity = GetComponent<Sanity>();
+        sanityConsumption = GetComponent<SanityConsumption>();
 
         // Tắt tất cả hitboxes ban đầu
         if (weaponHitboxes != null)
@@ -60,6 +63,16 @@ public class PlayerAttack : MonoBehaviour
         if (playerCapacity == null)
         {
             Debug.LogError("❌ PlayerCapacity not found!");
+        }
+
+        if (sanity == null)
+        {
+            Debug.LogWarning("⚠️ Sanity component not found!");
+        }
+
+        if (sanityConsumption == null)
+        {
+            Debug.LogWarning("⚠️ SanityConsumption component not found!");
         }
 
         // Set hitbox ban đầu dựa trên weapon hiện tại
@@ -96,7 +109,6 @@ public class PlayerAttack : MonoBehaviour
         if (weaponHitboxes != null && weaponType < weaponHitboxes.Length && weaponHitboxes[weaponType] != null)
         {
             currentHitbox = weaponHitboxes[weaponType];
-            Debug.Log($"✅ Switched to Weapon Type {weaponType} hitbox");
         }
         else
         {
@@ -125,6 +137,18 @@ public class PlayerAttack : MonoBehaviour
         // Check stamina
         if (stamina != null && stamina.currentStamina < finalCost) return;
 
+        // Check sanity (nếu weapon type tốn sanity)
+        float sanityCost = 0f;
+        if (sanityConsumption != null && sanityConsumption.DoesWeaponTypeConsumeSanity(weaponType))
+        {
+            sanityCost = sanityConsumption.CalculateSanityConsumption(weaponType);
+            if (sanity != null && sanity.GetCurrentSanity() < sanityCost)
+            {
+                Debug.Log($"⚠️ Not enough sanity! Need: {sanityCost:F1}, Have: {sanity.GetCurrentSanity():F1}");
+                return;
+            }
+        }
+
         if (Input.GetMouseButtonDown(0))
         {
             canAttack = false;
@@ -137,9 +161,16 @@ public class PlayerAttack : MonoBehaviour
                 stamina.OnStaminaUsed();
             }
 
+            // Trừ sanity (nếu weapon type tốn sanity)
+            if (sanityCost > 0f && sanity != null)
+            {
+                sanity.DecreaseSanity(sanityCost);
+                Debug.Log($"🧠 Sanity consumed: {sanityCost:F1} ({sanity.GetCurrentSanity():F1}/{sanity.GetMaxSanity()})");
+            }
+
             // Set Animator parameters
             anim.SetTrigger("IsAttack");
-            anim.SetInteger("WeaponType", weaponType); // ← SET WEAPON TYPE CHO ANIMATOR
+            anim.SetInteger("WeaponType", weaponType);
 
             if (playerController != null)
             {
@@ -153,7 +184,8 @@ public class PlayerAttack : MonoBehaviour
             if (playerCapacity != null)
             {
                 float loadPercentage = weaponController.GetLoadPercentage();
-                Debug.Log($"⚔️ Attack | WeaponType: {weaponType} | Load: {loadPercentage:F1}% | Modifier: {loadModifier:F2}x | Cooldown: {finalCooldown:F2}s | Cost: {finalCost}");
+                string sanityInfo = sanityCost > 0f ? $" | Sanity Cost: {sanityCost:F1}" : "";
+                Debug.Log($"⚔️ Attack | WeaponType: {weaponType} | Load: {loadPercentage:F1}% | Modifier: {loadModifier:F2}x | Cooldown: {finalCooldown:F2}s | Stamina Cost: {finalCost}{sanityInfo}");
             }
         }
     }
@@ -224,14 +256,32 @@ public class PlayerAttack : MonoBehaviour
 
     public void EnableMelee()
     {
+        Debug.Log($"🔵 EnableMelee called - currentHitbox: {(currentHitbox != null ? currentHitbox.name : "NULL")}");
+
         if (currentHitbox != null)
+        {
             currentHitbox.SetActive(true);
+            Debug.Log($"✅ Hitbox ENABLED: {currentHitbox.name}");
+        }
+        else
+        {
+            Debug.LogError("❌ currentHitbox is NULL!");
+        }
     }
 
     public void DisableMelee()
     {
+        Debug.Log($"🔴 DisableMelee called - currentHitbox: {(currentHitbox != null ? currentHitbox.name : "NULL")}");
+
         if (currentHitbox != null)
+        {
             currentHitbox.SetActive(false);
+            Debug.Log($"❌ Hitbox DISABLED: {currentHitbox.name}");
+        }
+        else
+        {
+            Debug.LogError("❌ currentHitbox is NULL!");
+        }
     }
 
     Vector2 SnapDirectionTo4Way(Vector2 dir)
@@ -293,5 +343,14 @@ public class PlayerAttack : MonoBehaviour
         WeaponStats weaponStats = weaponController != null ? weaponController.GetWeaponStats() : null;
         int baseCost = weaponStats != null ? weaponStats.GetStaminaCost() : defaultStaminaCost;
         return Mathf.CeilToInt(baseCost * GetEquipLoadModifier());
+    }
+
+    /// <summary>
+    /// Lấy weapon type hiện tại (để SanityConsumption có thể sử dụng)
+    /// </summary>
+    public int GetCurrentWeaponType()
+    {
+        WeaponStats weaponStats = weaponController != null ? weaponController.GetWeaponStats() : null;
+        return weaponStats != null ? weaponStats.GetWeaponType() : 0;
     }
 }

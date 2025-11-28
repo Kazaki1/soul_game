@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d292e86a144dce47ad6a66b2ca37fb0, type: 3}
+  m_Name: MainShopData
+  m_EditorClassIdentifier: Assembly-CSharp::ShopData
+  shopName: SHOP VPN
+  shopItems:
+  - itemID: potion_hp
+    itemName: Health Potion
+    itemIcon: {fileID: 2530564911472380330, guid: 7bfa1fda12a8ed24bbfce38a20918744, type: 3}
+    price: 20000
+    description: "H\u1ED3i 50 HP"
+    itemType: 2
+    healthRestore: 50
+    attackBonus: 0
+    defenseBonus: 0
+  - itemID: "KI\u1EBEM"
+    itemName: "KI\u1EBEM TI\xCAN"
+    itemIcon: {fileID: 712035800519618848, guid: b428ed23d008ccc4fbe3a000263ffaa2, type: 3}
+    price: 250
+    description: "G\xC2Y S\xC1T TH\u01AF\u01A0NG KH\u1EE6NG"
+    itemType: 2
+    healthRestore: 50
+    attackBonus: 0
+    defenseBonus: 0
+  - itemID: sword_iron
+    itemName: Iron Sword
+    itemIcon: {fileID: -855298285791758126, guid: f2b2a487176fe484aafa1853f382ea75, type: 3}
+    price: 100
+    description: "T\u0103ng 10 s\xE1t th\u01B0\u01A1ng"
+    itemType: 0
+    healthRestore: 50
+    attackBonus: 0
+    defenseBonus: 0

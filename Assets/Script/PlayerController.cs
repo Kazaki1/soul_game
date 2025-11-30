@@ -34,7 +34,7 @@ public class PlayerController : MonoBehaviour
 
     public float dough_cooldown = 1f;
     bool isDoughing = false;
-    bool canDough = true;
+    public bool canDough = true;
     bool isInvincible = false;
 
     private PlayerWeaponController weaponController;
@@ -112,7 +112,6 @@ public class PlayerController : MonoBehaviour
 
         if (moveX != 0f || moveY != 0f)
         {
-
             isMoving = true;
             if (!DialogueManager.GetInstance().dialogueIsPlaying)
             {

@@ -1,4 +1,7 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
+using System.Collections;
+using InventorySampleScene;
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -7,126 +10,173 @@ public class PlayerHealth : MonoBehaviour
 
     [Header("Base Stats")]
     public int baseHealth = 100;
-
     public HealthBar healthBar;
 
     private PlayerStats stats;
-    private ItemController itemController; // Thêm reference đến ItemController
+    private Stamina playerStamina;
+
+    public Image blackScreen;
+    public float respawnDelay = 5f;
+
+    private bool isDead = false;
+    private bool isRespawning = false;
+
+    public static PlayerHealth Instance { get; private set; }
 
     private void Awake()
     {
         stats = GetComponent<PlayerStats>();
-        itemController = GetComponent<ItemController>(); // Thêm để lấy buffs
-
-        if (itemController == null)
-        {
-            Debug.LogWarning("ItemController không tìm thấy! Không có health buff.");
-        }
+        playerStamina = GetComponent<Stamina>();
+        Instance = this;
     }
 
     private void Start()
     {
         if (stats != null)
             UpdateMaxHealthFromVigor(true);
+
+        if (blackScreen != null)
+        {
+            Color c = blackScreen.color;
+            c.a = 0;
+            blackScreen.color = c;
+            blackScreen.gameObject.SetActive(true);
+        }
     }
 
     public void UpdateMaxHealthFromVigor(bool fullHeal = true)
     {
-        if (stats == null)
-        {
-            return;
-        }
+        if (stats == null) return;
 
-        int baseMaxHealth = CalculateHealthFromVigor(stats.vigor);
-
-        // Áp dụng health buff từ items
-        float buffMultiplier = 1f;
-        if (itemController != null)
-        {
-            float buffPercent = itemController.GetTotalHealthBuffPercent();
-            buffMultiplier += buffPercent / 100f;
-        }
-
-        maxHealth = Mathf.RoundToInt(baseMaxHealth * buffMultiplier);
-
-        if (fullHeal)
-            currentHealth = maxHealth;
-        else
-            currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-
-        if (healthBar != null)
-        {
-            healthBar.SetMaxHealth(maxHealth);
-            healthBar.SetHealth(currentHealth);
-        }
-
-        Debug.Log($"Updated Max Health: {maxHealth} (Base: {baseMaxHealth} | Buff Multiplier: {buffMultiplier:F2})");
+        maxHealth = CalculateHealthFromVigor(stats.vigor);
+        currentHealth = fullHeal ? maxHealth : Mathf.Clamp(currentHealth, 0, maxHealth);
+        UpdateHealthBar();
     }
 
     public int CalculateHealthFromVigor(int vigor)
     {
         int hp = baseHealth;
-
         for (int lv = 1; lv <= vigor; lv++)
         {
             int gain;
-
             if (lv <= 40)
-            {
-                float t = (lv - 1) / 39f;
-                gain = Mathf.RoundToInt(Mathf.Lerp(48, 4, t));  // +48 → +4
-            }
+                gain = Mathf.RoundToInt(Mathf.Lerp(48, 4, (lv - 1) / 39f));
             else if (lv <= 60)
-            {
-                float t = (lv - 41) / 19f;
-                gain = Mathf.RoundToInt(Mathf.Lerp(26, 13, t)); // +26 → +13
-            }
+                gain = Mathf.RoundToInt(Mathf.Lerp(26, 13, (lv - 41) / 19f));
             else
-            {
-                float t = (lv - 61) / 38f;
-                gain = Mathf.RoundToInt(Mathf.Lerp(6, 3, t));   // +6 → +3
-            }
-
+                gain = Mathf.RoundToInt(Mathf.Lerp(6, 3, (lv - 61) / 38f));
             hp += gain;
         }
-
         return hp;
     }
 
     public void TakeDamage(int damage)
     {
-        int previousHealth = currentHealth;
-        currentHealth -= damage;
-        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+        if (isDead) return;
+        currentHealth = Mathf.Clamp(currentHealth - damage, 0, maxHealth);
+        UpdateHealthBar();
+        if (currentHealth <= 0 && !isDead)
+        {
+            isDead = true;
+            StartCoroutine(DeathAndRespawn());
+        }
+    }
 
-        healthBar.SetHealth(currentHealth);
+    private IEnumerator DeathAndRespawn()
+    {
+        if (blackScreen != null)
+        {
+            float t = 0;
+            Color c = blackScreen.color;
+            while (t < 1f)
+            {
+                t += Time.deltaTime;
+                c.a = Mathf.Lerp(0, 1, t);
+                blackScreen.color = c;
+                yield return null;
+            }
+        }
 
-        // Debug info
-        Debug.Log($"💔 Player took {damage} damage! ({previousHealth} → {currentHealth}/{maxHealth})");
+        yield return new WaitForSeconds(respawnDelay);
 
-        if (currentHealth <= 0)
-            Die();
+        RespawnAtCheckpoint();
+
+        if (blackScreen != null)
+        {
+            float t = 0;
+            Color c = blackScreen.color;
+            while (t < 1f)
+            {
+                t += Time.deltaTime;
+                c.a = Mathf.Lerp(1, 0, t);
+                blackScreen.color = c;
+                yield return null;
+            }
+        }
+    }
+
+    private void RespawnAtCheckpoint()
+    {
+        if (isRespawning) return;
+        isRespawning = true;
+
+        if (!SaveSystem.HasSave())
+        {
+            SetFullHealth();
+            if (playerStamina != null)
+                playerStamina.currentStamina = playerStamina.maxStamina;
+            FinishRespawn();
+            return;
+        }
+
+        SaveData snapshot = SaveSystem.LoadSnapshot();
+        if (snapshot != null)
+        {
+            transform.position = snapshot.playerPos;
+            transform.eulerAngles = snapshot.playerRot;
+            currentHealth = Mathf.Clamp(Mathf.RoundToInt(snapshot.health), 0, maxHealth);
+            if (playerStamina != null)
+                playerStamina.currentStamina = snapshot.stamina;
+            UpdateHealthBar();
+        }
+        else
+        {
+            SetFullHealth();
+            if (playerStamina != null)
+                playerStamina.currentStamina = playerStamina.maxStamina;
+        }
+
+        FinishRespawn();
+    }
+
+    private void FinishRespawn()
+    {
+        isDead = false;
+        isRespawning = false;
+    }
+
+    private void UpdateHealthBar()
+    {
+        if (healthBar != null)
+        {
+            healthBar.SetMaxHealth(maxHealth);
+            healthBar.SetHealth(currentHealth);
+        }
     }
 
     public void Heal(int amount)
     {
-        int previousHealth = currentHealth;
-        currentHealth += amount;
-        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-
-        healthBar.SetHealth(currentHealth);
-
-        Debug.Log($"💚 Player healed {amount} HP! ({previousHealth} → {currentHealth}/{maxHealth})");
+        if (amount <= 0) return;
+        currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
+        UpdateHealthBar();
     }
 
-    private void Die()
-    {
-        Debug.Log("💀 Player died!");
-        // TODO: Implement death logic
-    }
-
-    // Getters (để EnemyDamageDeal có thể lấy max HP)
     public int GetMaxHealth() => maxHealth;
     public int GetCurrentHealth() => currentHealth;
-    public float GetHealthPercentage() => (float)currentHealth / maxHealth;
+
+    public void SetFullHealth()
+    {
+        currentHealth = maxHealth;
+        UpdateHealthBar();
+    }
 }

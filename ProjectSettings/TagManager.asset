@@ -14,12 +14,12 @@ TagManager:
   - UI
   - Obstacle
   - Player
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Item
+  - checkpoint
+  - Head
+  - Chest
+  - Leg
+  - Boots
   - 
   - 
   - 

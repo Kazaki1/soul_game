@@ -19,32 +19,22 @@ public class SanityConsumption : MonoBehaviour
     {
         public string weaponTypeName = "Type 0";
         public int weaponType = 0;
-        public bool consumesSanity = false; // Có tốn sanity không
-        public float sanityMultiplier = 1f; // Multiplier riêng cho weapon type này
-    }
+        public bool consumesSanity = false; 
+        public float sanityMultiplier = 1f;   }
 
     private void Start()
     {
         playerStats = GetComponent<PlayerStats>();
-
-        if (playerStats == null)
-        {
-            Debug.LogError("PlayerStats component not found!");
-        }
     }
 
-    /// <summary>
-    /// Tính Sanity Consumption cho weapon type cụ thể
-    /// Trả về 0 nếu weapon type đó không tốn sanity
-    /// </summary>
+   
     public float CalculateSanityConsumption(int weaponType)
     {
-        // Kiểm tra weapon type này có tốn sanity không
-        WeaponTypeSanityConfig config = GetConfigForWeaponType(weaponType);
+          WeaponTypeSanityConfig config = GetConfigForWeaponType(weaponType);
 
         if (config == null || !config.consumesSanity)
         {
-            return 0f; // Không tốn sanity
+            return 0f; 
         }
 
         if (playerStats == null)
@@ -53,8 +43,7 @@ public class SanityConsumption : MonoBehaviour
         int intLevel = playerStats.intelligence;
         float costMultiplier;
 
-        // Xác định multiplier dựa trên Intelligence level
-        if (intLevel <= 30)
+          if (intLevel <= 30)
         {
             costMultiplier = 1.0f;
         }
@@ -62,8 +51,7 @@ public class SanityConsumption : MonoBehaviour
         {
             costMultiplier = 0.85f;
         }
-        else // 61-99
-        {
+        else        {
             costMultiplier = 0.7f;
         }
 
@@ -71,19 +59,12 @@ public class SanityConsumption : MonoBehaviour
 
         return finalCost;
     }
-
-    /// <summary>
-    /// Kiểm tra weapon type có tốn sanity không
-    /// </summary>
     public bool DoesWeaponTypeConsumeSanity(int weaponType)
     {
         WeaponTypeSanityConfig config = GetConfigForWeaponType(weaponType);
         return config != null && config.consumesSanity;
     }
 
-    /// <summary>
-    /// Lấy config cho weapon type
-    /// </summary>
     private WeaponTypeSanityConfig GetConfigForWeaponType(int weaponType)
     {
         if (weaponTypeConfigs == null) return null;
@@ -98,8 +79,6 @@ public class SanityConsumption : MonoBehaviour
 
         return null;
     }
-
-    // Getters/Setters
     public float GetBaseConsumption() => baseSanityConsumption;
     public void SetBaseConsumption(float value) => baseSanityConsumption = Mathf.Max(0f, value);
 }

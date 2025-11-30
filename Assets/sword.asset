@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc650fb44a26cb948ac1c59e7b024a1e, type: 3}
+  m_Name: sword
+  m_EditorClassIdentifier: Assembly-CSharp::Scriptable_object
+  item_name: sword
+  itemIcon: {fileID: 712035800519618848, guid: b428ed23d008ccc4fbe3a000263ffaa2, type: 3}
+  description: Item description here
+  itemType: 1
+  IsUseableAnywhere: 0
+  maxStack: 99
+  healAmount: 0
+  damage: 0
+  defense: 0
+  weaponPrefab: {fileID: 305242330218434079, guid: ed83db58e39b7fc42b17850fc83162c3, type: 3}
+  weaponAnimator: {fileID: 0}
+  dropPrefab: {fileID: 0}
+  armorTag: 4

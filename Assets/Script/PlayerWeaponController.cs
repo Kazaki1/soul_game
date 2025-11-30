@@ -4,9 +4,16 @@ public class PlayerWeaponController : MonoBehaviour
 {
     [Header("Equipped Weapon")]
     [SerializeField] private GameObject equippedWeapon;
-
     private WeaponDamage weaponDamage;
     private WeaponStats weaponStats;
+    [Header("Equipped Weapons")]
+    [SerializeField] private GameObject leftHandWeapon;   // Weapon hiện tại
+    [SerializeField] private GameObject rightHandWeapon;
+    [Header("Weapon Transforms")]
+    public Transform leftHand;
+    public Transform rightHand;  // ✅ THÊM MỚI
+
+    private bool isSwapping = false;  
     private float cachedWeaponDamage;
 
     private PlayerCapacity playerCapacity;
@@ -34,7 +41,7 @@ public class PlayerWeaponController : MonoBehaviour
     /// </summary>
     private void LoadWeapon()
     {
-        if (equippedWeapon == null)
+        if (leftHandWeapon == null)
         {
             weaponDamage = null;
             weaponStats = null;
@@ -43,26 +50,24 @@ public class PlayerWeaponController : MonoBehaviour
             return;
         }
 
-        weaponDamage = equippedWeapon.GetComponent<WeaponDamage>();
-        weaponStats = equippedWeapon.GetComponent<WeaponStats>();
+        weaponDamage = leftHandWeapon.GetComponent<WeaponDamage>();
+        weaponStats = leftHandWeapon.GetComponent<WeaponStats>();
 
         if (weaponDamage == null)
         {
-            Debug.LogError($"Weapon {equippedWeapon.name} không có WeaponDamage component!");
+            Debug.LogError($"Weapon {leftHandWeapon.name} không có WeaponDamage component!");
             cachedWeaponDamage = 0f;
             return;
         }
 
         if (weaponStats == null)
         {
-            Debug.LogError($"Weapon {equippedWeapon.name} không có WeaponStats component!");
+            Debug.LogError($"Weapon {leftHandWeapon.name} không có WeaponStats component!");
         }
 
-        // Cache damage
         UpdateWeaponDamage();
-        Debug.Log($"Loaded weapon: {equippedWeapon.name} - Damage: {cachedWeaponDamage:F1}, Weight: {GetCurrentWeaponWeight():F1}");
+        Debug.Log($"Loaded weapon: {leftHandWeapon.name} - Damage: {cachedWeaponDamage:F1}");
     }
-
     /// <summary>
     /// Cập nhật weapon damage (gọi khi stat thay đổi)
     /// </summary>
@@ -91,15 +96,42 @@ public class PlayerWeaponController : MonoBehaviour
     /// </summary>
     public void EquipWeapon(GameObject newWeapon)
     {
-        // Unequip weapon cũ nếu có
-        if (equippedWeapon != null)
+        if (newWeapon == null)
         {
-            Debug.Log($"Unequipped {equippedWeapon.name}");
+            Debug.LogError("❌ Cannot equip NULL weapon!");
+            return;
         }
 
-        // Equip weapon mới
-        equippedWeapon = newWeapon;
+        // Nếu left hand đã có weapon → chuyển sang right hand
+        if (leftHandWeapon != null)
+        {
+            // Destroy right hand weapon cũ nếu có
+            if (rightHandWeapon != null)
+            {
+                Destroy(rightHandWeapon);
+                Debug.Log($"🗑️ Destroyed old right hand weapon");
+            }
+
+            // Chuyển left → right
+            rightHandWeapon = leftHandWeapon;
+            rightHandWeapon.transform.SetParent(rightHand);
+            rightHandWeapon.transform.localPosition = Vector3.zero;
+            rightHandWeapon.transform.localRotation = Quaternion.identity;
+            rightHandWeapon.SetActive(false); // Ẩn weapon ở right hand
+
+            Debug.Log($"🔄 Moved left weapon to right hand: {rightHandWeapon.name}");
+        }
+
+        // Equip weapon mới vào left hand
+        leftHandWeapon = newWeapon;
+        leftHandWeapon.transform.SetParent(leftHand);
+        leftHandWeapon.transform.localPosition = Vector3.zero;
+        leftHandWeapon.transform.localRotation = Quaternion.identity;
+        leftHandWeapon.SetActive(true);
+
         LoadWeapon();
+
+        Debug.Log($"✅ Equipped weapon to left hand: {leftHandWeapon.name}");
     }
 
     /// <summary>
@@ -107,17 +139,17 @@ public class PlayerWeaponController : MonoBehaviour
     /// </summary>
     public void UnequipWeapon()
     {
-        if (equippedWeapon != null)
+        if (leftHandWeapon != null)
         {
-            Debug.Log($"Unequipped {equippedWeapon.name}");
+            Destroy(leftHandWeapon);
+            Debug.Log($"🗑️ Unequipped left hand weapon");
         }
 
-        equippedWeapon = null;
+        leftHandWeapon = null;
         weaponDamage = null;
         weaponStats = null;
         cachedWeaponDamage = 0f;
     }
-
     /// <summary>
     /// Kiểm tra có weapon không
     /// </summary>
@@ -198,9 +230,6 @@ public class PlayerWeaponController : MonoBehaviour
         return (GetCurrentEquipLoad() / maxLoad) * 100f;
     }
 
-    /// <summary>
-    /// Kiểm tra có bị overload không (> 100%)
-    /// </summary>
     public bool IsOverloaded()
     {
         return GetLoadPercentage() > 100f;
@@ -231,4 +260,92 @@ public class PlayerWeaponController : MonoBehaviour
     {
         return weaponStats;
     }
+    /// <summary>
+    /// Swap weapon giữa left hand và right hand
+    /// </summary>
+    public void QuickSwapWeapons()
+    {
+        if (isSwapping)
+        {
+            Debug.LogWarning("⚠️ Đang trong quá trình swap, chờ xíu!");
+            return;
+        }
+
+        if (leftHandWeapon == null && rightHandWeapon == null)
+        {
+            Debug.LogWarning("⚠️ Không có weapon nào để swap!");
+            return;
+        }
+
+        isSwapping = true;
+
+        // Swap references
+        GameObject temp = leftHandWeapon;
+        leftHandWeapon = rightHandWeapon;
+        rightHandWeapon = temp;
+
+        // Cập nhật transforms và visibility
+        if (leftHandWeapon != null)
+        {
+            leftHandWeapon.transform.SetParent(leftHand);
+            leftHandWeapon.transform.localPosition = Vector3.zero;
+            leftHandWeapon.transform.localRotation = Quaternion.identity;
+            leftHandWeapon.SetActive(true);
+        }
+
+        if (rightHandWeapon != null)
+        {
+            rightHandWeapon.transform.SetParent(rightHand);
+            rightHandWeapon.transform.localPosition = Vector3.zero;
+            rightHandWeapon.transform.localRotation = Quaternion.identity;
+            rightHandWeapon.SetActive(false);
+        }
+
+        // Reload weapon stats
+        LoadWeapon();
+
+      
+        Debug.Log($"🔄 Swapped weapons - Active: {leftHandWeapon?.name ?? "None"}");
+
+        isSwapping = false;
+    }
+
+    /// <summary>
+    /// Lấy weapon ở right hand (để UI sync)
+    /// </summary>
+    public GameObject GetRightHandWeapon()
+    {
+        return rightHandWeapon;
+    }
+
+    /// <summary>
+    /// Lấy weapon ở left hand (để UI sync)
+    /// </summary>
+    public GameObject GetLeftHandWeapon()
+    {
+        return leftHandWeapon;
+    }
+    public void EquipWeaponFromInventory(GameObject weaponPrefab)
+    {
+        if (weaponPrefab == null)
+        {
+            Debug.LogError("Prefab weapon null!");
+            return;
+        }
+
+        // Destroy weapon hiện tại nếu có
+        if (equippedWeapon != null)
+        {
+            Destroy(equippedWeapon);
+        }
+
+        // Instantiate weapon mới vào leftHand
+        equippedWeapon = Instantiate(weaponPrefab, leftHand);
+        equippedWeapon.transform.localPosition = Vector3.zero;
+        equippedWeapon.transform.localRotation = Quaternion.identity;
+
+        // Load stats
+        LoadWeapon();
+    }
+
 }

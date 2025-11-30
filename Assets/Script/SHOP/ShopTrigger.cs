@@ -9,10 +9,10 @@ public class ShopTrigger : MonoBehaviour
     [Header("Interaction Settings")]
     public KeyCode interactKey = KeyCode.E;
     public float interactionRange = 2f;
-    public bool useColliderTrigger = true; // true = dùng OnTrigger, false = dùng distance check
+    public bool useColliderTrigger = true; 
 
     [Header("UI")]
-    public GameObject interactionPrompt; // Canvas hiển thị "Press E"
+    public GameObject interactionPrompt;
     public TextMeshProUGUI promptText;
 
     private Transform player;
@@ -27,15 +27,12 @@ public class ShopTrigger : MonoBehaviour
         else
             Debug.LogWarning("Không tìm thấy Player! Đảm bảo Player có tag 'Player'");
 
-        // Ẩn prompt lúc đầu
         if (interactionPrompt != null)
             interactionPrompt.SetActive(false);
 
-        // Set text
-        if (promptText != null)
+       if (promptText != null)
             promptText.text = $"Nhấn [{interactKey}] để mở shop";
 
-        // Tìm ShopManager nếu chưa gán
         if (shopManager == null)
             shopManager = FindObjectOfType<ShopManager>();
     }
@@ -44,14 +41,12 @@ public class ShopTrigger : MonoBehaviour
     {
         if (player == null || shopManager == null) return;
 
-        // Kiểm tra khoảng cách nếu không dùng trigger
         if (!useColliderTrigger)
         {
             float distance = Vector2.Distance(transform.position, player.position);
             bool wasInRange = playerInRange;
             playerInRange = distance <= interactionRange;
 
-            // Update prompt
             if (playerInRange != wasInRange)
             {
                 if (interactionPrompt != null)
@@ -59,20 +54,16 @@ public class ShopTrigger : MonoBehaviour
             }
         }
 
-        // Mở shop khi nhấn phím
-        if (playerInRange && Input.GetKeyDown(interactKey))
+           if (playerInRange && Input.GetKeyDown(interactKey))
         {
             shopManager.OpenShop();
         }
-
-        // Đóng shop khi nhấn ESC
         if (Input.GetKeyDown(KeyCode.Escape) && shopManager.shopPanel.activeSelf)
         {
             shopManager.CloseShop();
         }
     }
 
-    // === DÙNG CHO TRIGGER COLLIDER ===
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (!useColliderTrigger) return;
@@ -97,7 +88,6 @@ public class ShopTrigger : MonoBehaviour
         }
     }
 
-    // === DEBUG ===
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;

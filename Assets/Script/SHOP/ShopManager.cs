@@ -10,7 +10,6 @@ public class ShopManager : MonoBehaviour
 
     [Header("Shop Mode")]
     public ShopMode currentMode = ShopMode.Buy;
-
     [Header("UI References")]
     public GameObject shopPanel;
     public Transform shopItemsContainer;
@@ -24,7 +23,7 @@ public class ShopManager : MonoBehaviour
 
     [Header("Sell Settings")]
     [Range(0.1f, 1f)]
-    public float sellPriceMultiplier = 0.5f; // Bán được 50% giá mua
+    public float sellPriceMultiplier = 0.5f; 
 
     [Header("Notification")]
     public GameObject notificationPanel;
@@ -44,7 +43,6 @@ public class ShopManager : MonoBehaviour
         if (closeButton != null)
             closeButton.onClick.AddListener(CloseShop);
 
-        // Setup mode buttons
         if (buyModeButton != null)
             buyModeButton.onClick.AddListener(() => SwitchMode(ShopMode.Buy));
 
@@ -53,12 +51,10 @@ public class ShopManager : MonoBehaviour
 
         LoadShopItems();
 
-        // Rebuild inventory items từ shop data
         if (SimpleInventory.Instance != null)
             SimpleInventory.Instance.RebuildItemsFromData(shopData);
     }
 
-    // Load tất cả items vào shop
     private void LoadShopItems()
     {
         if (shopData == null)
@@ -67,7 +63,6 @@ public class ShopManager : MonoBehaviour
             return;
         }
 
-        // Clear items cũ
         foreach (var item in spawnedItems)
         {
             if (item != null)
@@ -87,14 +82,12 @@ public class ShopManager : MonoBehaviour
         UpdateModeButtons();
     }
 
-    // Load chế độ MUA
+    
     private void LoadBuyMode()
     {
-        // Set shop title
         if (shopTitleText != null)
             shopTitleText.text = $"{shopData.shopName} - MUA";
 
-        // Spawn shop items
         foreach (var itemData in shopData.shopItems)
         {
             GameObject itemSlot = Instantiate(shopItemSlotPrefab, shopItemsContainer);
@@ -107,11 +100,8 @@ public class ShopManager : MonoBehaviour
             }
         }
     }
-
-    // Load chế độ BÁN
     private void LoadSellMode()
     {
-        // Set shop title
         if (shopTitleText != null)
             shopTitleText.text = $"{shopData.shopName} - BÁN";
 
@@ -121,12 +111,10 @@ public class ShopManager : MonoBehaviour
             return;
         }
 
-        // Spawn inventory items
         List<InventoryItem> inventoryItems = SimpleInventory.Instance.GetItems();
 
         if (inventoryItems.Count == 0)
         {
-            // Hiển thị thông báo không có gì để bán
             ShowNotification("Không có vật phẩm để bán!");
         }
 
@@ -147,7 +135,6 @@ public class ShopManager : MonoBehaviour
         }
     }
 
-    // Switch mode
     public void SwitchMode(ShopMode mode)
     {
         if (currentMode == mode) return;
@@ -156,7 +143,6 @@ public class ShopManager : MonoBehaviour
         LoadShopItems();
     }
 
-    // Update button states
     private void UpdateModeButtons()
     {
         if (buyModeButton != null)
@@ -174,13 +160,11 @@ public class ShopManager : MonoBehaviour
         }
     }
 
-    // Tính giá bán
     public int GetSellPrice(int buyPrice)
     {
         return Mathf.RoundToInt(buyPrice * sellPriceMultiplier);
     }
 
-    // Mua item
     public void BuyItem(ShopItem item)
     {
         if (item == null)
@@ -189,41 +173,37 @@ public class ShopManager : MonoBehaviour
             return;
         }
 
-        // Kiểm tra tiền
         if (!MoneyManager.Instance.HasEnoughMoney(item.price))
         {
             ShowNotification("Không đủ tiền!");
             return;
         }
 
-        // Trừ tiền
         if (MoneyManager.Instance.SpendMoney(item.price))
         {
-            // Thêm vào inventory
-            if (SimpleInventory.Instance != null)
+            if (Inventory_mananegment.Instance != null)
             {
-                if (SimpleInventory.Instance.AddItem(item))
+                bool added = Inventory_mananegment.Instance.AddItemFromShop(item);
+
+                if (added)
                 {
                     ShowNotification($"Đã mua {item.itemName}!");
-                    Debug.Log($"Mua thành công: {item.itemName}");
+                    Debug.Log($"Đã thêm {item.itemName} vào Inventory!");
                 }
                 else
                 {
-                    // Hoàn tiền nếu inventory đầy
                     MoneyManager.Instance.AddMoney(item.price);
                     ShowNotification("Inventory đầy!");
                 }
             }
             else
             {
-                // Không có inventory, áp dụng hiệu ứng trực tiếp
-                ApplyItemEffect(item);
+              ApplyItemEffect(item);
                 ShowNotification($"Đã mua {item.itemName}!");
             }
         }
     }
 
-    // Bán item
     public void SellItem(ShopItem item)
     {
         if (item == null || SimpleInventory.Instance == null)
@@ -232,50 +212,39 @@ public class ShopManager : MonoBehaviour
             return;
         }
 
-        // Kiểm tra có item trong inventory không
         if (!SimpleInventory.Instance.HasItem(item.itemID))
         {
             ShowNotification("Không có item này trong inventory!");
             return;
         }
 
-        // Tính giá bán
         int sellPrice = GetSellPrice(item.price);
 
-        // Xóa khỏi inventory
         if (SimpleInventory.Instance.RemoveItem(item.itemID))
         {
-            // Thêm tiền
             MoneyManager.Instance.AddMoney(sellPrice);
             ShowNotification($"Đã bán {item.itemName} với giá {sellPrice}G!");
             Debug.Log($"Bán thành công: {item.itemName} - Nhận {sellPrice}G");
 
-            // Reload để cập nhật số lượng
             LoadShopItems();
         }
     }
 
-    // Áp dụng hiệu ứng item (Nếu bạn không dùng inventory)
     private void ApplyItemEffect(ShopItem item)
     {
-        // Tạm thời chỉ log, bạn có thể kết nối với player script sau
         switch (item.itemType)
         {
             case ItemType.Potion:
                 if (item.healthRestore > 0)
                 {
                     Debug.Log($"[ITEM EFFECT] Restored {item.healthRestore} HP");
-                    // TODO: Kết nối với player health system
-                    // PlayerHealth.Instance.Heal(item.healthRestore);
-                }
+               }
                 break;
 
             case ItemType.Weapon:
                 if (item.attackBonus > 0)
                 {
                     Debug.Log($"[ITEM EFFECT] Attack +{item.attackBonus}");
-                    // TODO: Kết nối với player stats
-                    // Player.Instance.AddAttack(item.attackBonus);
                 }
                 break;
 
@@ -283,25 +252,12 @@ public class ShopManager : MonoBehaviour
                 if (item.defenseBonus > 0)
                 {
                     Debug.Log($"[ITEM EFFECT] Defense +{item.defenseBonus}");
-                    // TODO: Kết nối với player stats
-                    // Player.Instance.AddDefense(item.defenseBonus);
                 }
-                break;
-
-            case ItemType.Upgrade:
-                Debug.Log($"[ITEM EFFECT] Permanent upgrade: {item.itemName}");
-                // TODO: Thêm logic nâng cấp
-                break;
-
-            case ItemType.Consumable:
-                Debug.Log($"[ITEM EFFECT] Used consumable: {item.itemName}");
-                // TODO: Thêm logic vật phẩm tiêu hao
                 break;
         }
     }
 
-    // Hiển thị notification
-    public void ShowNotification(string message)
+   public void ShowNotification(string message)
     {
         if (notificationPanel != null && notificationText != null)
         {
@@ -315,7 +271,6 @@ public class ShopManager : MonoBehaviour
 
     private void Update()
     {
-        // Tự động ẩn notification
         if (notificationPanel != null && notificationPanel.activeSelf)
         {
             notificationTimer -= Time.unscaledDeltaTime;
@@ -326,21 +281,18 @@ public class ShopManager : MonoBehaviour
         }
     }
 
-    // Mở shop
     public void OpenShop()
     {
         shopPanel.SetActive(true);
-        Time.timeScale = 0f; // Pause game
+        Time.timeScale = 0f;
     }
 
-    // Đóng shop
     public void CloseShop()
     {
         shopPanel.SetActive(false);
-        Time.timeScale = 1f; // Resume game
-    }
+        Time.timeScale = 1f;  }
 
-    // Toggle shop
+    
     public void ToggleShop()
     {
         if (shopPanel.activeSelf)
@@ -350,9 +302,7 @@ public class ShopManager : MonoBehaviour
     }
 }
 
-// Enum chế độ shop
 public enum ShopMode
 {
-    Buy,    // Chế độ mua
-    Sell    // Chế độ bán
+    Buy,     Sell 
 }

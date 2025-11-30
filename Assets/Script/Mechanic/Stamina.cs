@@ -22,29 +22,15 @@ public class Stamina : MonoBehaviour
 
     private PlayerStats stats;
     private PlayerWeaponController weaponController;
-    private PlayerCapacity playerCapacity;
-    private ItemController itemController; // Thêm reference đến ItemController
 
     private void Awake()
     {
         stats = GetComponent<PlayerStats>();
         weaponController = GetComponent<PlayerWeaponController>();
-        playerCapacity = GetComponent<PlayerCapacity>();
-        itemController = GetComponent<ItemController>(); // Thêm để lấy buffs
 
         if (weaponController == null)
         {
             Debug.LogWarning("⚠️ PlayerWeaponController not found! Load system won't affect stamina regen.");
-        }
-
-        if (playerCapacity == null)
-        {
-            Debug.LogWarning("⚠️ PlayerCapacity not found! Load system won't affect stamina regen.");
-        }
-
-        if (itemController == null)
-        {
-            Debug.LogWarning("⚠️ ItemController not found! Không có stamina buff.");
         }
     }
 
@@ -124,11 +110,9 @@ public class Stamina : MonoBehaviour
     /// </summary>
     private float GetEquipLoadModifier()
     {
-        if (playerCapacity == null) return 1.0f;
+        if (weaponController == null) return 1.0f;
 
-        float currentLoad = playerCapacity.GetCurrentLoad();
-        float maxLoad = playerCapacity.GetMaxEquipLoad();
-        float loadPercentage = (currentLoad / maxLoad) * 100f;
+        float loadPercentage = weaponController.GetLoadPercentage();
 
         if (loadPercentage < 50f)
         {
@@ -157,11 +141,9 @@ public class Stamina : MonoBehaviour
     /// </summary>
     public string GetStaminaRegenTier()
     {
-        if (playerCapacity == null) return "Unknown";
+        if (weaponController == null) return "Unknown";
 
-        float currentLoad = playerCapacity.GetCurrentLoad();
-        float maxLoad = playerCapacity.GetMaxEquipLoad();
-        float loadPercentage = (currentLoad / maxLoad) * 100f;
+        float loadPercentage = weaponController.GetLoadPercentage();
 
         if (loadPercentage < 50f)
             return "Light Load (Regen +10% faster)";
@@ -185,17 +167,7 @@ public class Stamina : MonoBehaviour
     {
         if (stats == null) return;
 
-        int baseMaxStamina = CalculateStaminaFromEndurance(stats.endurance);
-
-        // Áp dụng stamina buff từ items
-        float buffMultiplier = 1f;
-        if (itemController != null)
-        {
-            float buffPercent = itemController.GetTotalStaminaBuffPercent();
-            buffMultiplier += buffPercent / 100f;
-        }
-
-        maxStamina = Mathf.RoundToInt(baseMaxStamina * buffMultiplier);
+        maxStamina = CalculateStaminaFromEndurance(stats.endurance);
 
         int bonusStamina = maxStamina - baseStamina;
         autoFillTime = baseAutoFillTime + (bonusStamina * autoFillTimePerStamina);
@@ -214,7 +186,7 @@ public class Stamina : MonoBehaviour
         // Debug info
         float modifiedTime = GetModifiedAutoFillTime();
         float regenRate = maxStamina / modifiedTime;
-        Debug.Log($"💚 Stamina Regen | Base Time: {autoFillTime:F2}s | Modified: {modifiedTime:F2}s | Rate: {regenRate:F1}/s | Buff Multiplier: {buffMultiplier:F2}");
+        Debug.Log($"💚 Stamina Regen | Base Time: {autoFillTime:F2}s | Modified: {modifiedTime:F2}s | Rate: {regenRate:F1}/s");
     }
 
     public int CalculateStaminaFromEndurance(int end)
@@ -259,5 +231,20 @@ public class Stamina : MonoBehaviour
     {
         float modifiedTime = GetModifiedAutoFillTime();
         return maxStamina / modifiedTime;
+    }
+   
+
+    // ⭐ THÊM MỚI
+    public void RestoreFullStamina()
+    {
+        currentStamina = maxStamina;
+
+        if (slider != null)
+        {
+            slider.maxValue = maxStamina;
+            slider.value = currentStamina;
+        }
+
+        Debug.Log("⚡ Stamina fully restored by checkpoint!");
     }
 }

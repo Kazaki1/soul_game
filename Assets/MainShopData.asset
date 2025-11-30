@@ -19,25 +19,28 @@ MonoBehaviour:
     itemIcon: {fileID: 2530564911472380330, guid: 7bfa1fda12a8ed24bbfce38a20918744, type: 3}
     price: 20000
     description: "H\u1ED3i 50 HP"
-    itemType: 2
+    itemType: 5
+    weaponPrefab: {fileID: 0}
     healthRestore: 50
     attackBonus: 0
     defenseBonus: 0
   - itemID: "KI\u1EBEM"
-    itemName: "KI\u1EBEM TI\xCAN"
+    itemName: "KI\u1EBEM "
     itemIcon: {fileID: 712035800519618848, guid: b428ed23d008ccc4fbe3a000263ffaa2, type: 3}
     price: 250
     description: "G\xC2Y S\xC1T TH\u01AF\u01A0NG KH\u1EE6NG"
-    itemType: 2
+    itemType: 1
+    weaponPrefab: {fileID: 5579939002963026797, guid: c996a4288e38193469b1f566689c9328, type: 3}
     healthRestore: 50
     attackBonus: 0
     defenseBonus: 0
-  - itemID: sword_iron
-    itemName: Iron Sword
+  - itemID: axe
+    itemName: axe
     itemIcon: {fileID: -855298285791758126, guid: f2b2a487176fe484aafa1853f382ea75, type: 3}
     price: 100
     description: "T\u0103ng 10 s\xE1t th\u01B0\u01A1ng"
-    itemType: 0
+    itemType: 1
+    weaponPrefab: {fileID: 6748977131535330673, guid: 8cffb6376324b264b8c5de97557985f7, type: 3}
     healthRestore: 50
     attackBonus: 0
     defenseBonus: 0

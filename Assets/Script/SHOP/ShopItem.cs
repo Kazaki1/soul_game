@@ -10,13 +10,12 @@ public class ShopItem
     [TextArea(2, 4)]
     public string description;
     public ItemType itemType;
-
-    // Giá trị item khi mua (tùy chọn)
-    public int healthRestore = 0;    // Cho potion
-    public int attackBonus = 0;       // Cho weapon
-    public int defenseBonus = 0;      // Cho armor
-
-    public ShopItem(string id, string name, Sprite icon, int price, string desc, ItemType type)
+    public GameObject itemPrefab;
+    public GameObject weaponPrefab;
+    public int healthRestore = 0;  
+    public int attackBonus = 0;    
+    public int defenseBonus = 0;   
+    public ShopItem(string id, string name, Sprite icon, int price, string desc, ItemType type, GameObject prefab)
     {
         itemID = id;
         itemName = name;
@@ -24,14 +23,15 @@ public class ShopItem
         this.price = price;
         description = desc;
         itemType = type;
+        weaponPrefab = prefab;
     }
 }
 
-public enum ItemType
+public enum ShopItemType
 {
-    Weapon,      // Vũ khí
-    Armor,       // Giáp
-    Potion,      // Thuốc
-    Consumable,  // Vật phẩm tiêu hao
-    Upgrade      // Nâng cấp
+    Weapon,      
+    Armor,       
+    Potion,      
+    Consumable,  
+    Upgrade      
 }

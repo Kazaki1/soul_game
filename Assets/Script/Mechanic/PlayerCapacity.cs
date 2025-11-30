@@ -13,15 +13,11 @@ public class PlayerCapacity : MonoBehaviour
 
     private PlayerStats playerStats;
     private PlayerWeaponController weaponController;
-    private ArmorController armorController;
-    private ItemController itemController; // Thêm reference đến ItemController
 
     private void Awake()
     {
         playerStats = GetComponent<PlayerStats>();
         weaponController = GetComponent<PlayerWeaponController>();
-        armorController = GetComponent<ArmorController>();
-        itemController = GetComponent<ItemController>(); // Thêm để lấy item weight
 
         if (playerStats == null)
         {
@@ -31,14 +27,6 @@ public class PlayerCapacity : MonoBehaviour
         if (weaponController == null)
         {
             Debug.LogWarning("PlayerWeaponController component not found!");
-        }
-        if (armorController == null)
-        {
-            Debug.LogWarning("ArmorController component not found!");
-        }
-        if (itemController == null)
-        {
-            Debug.LogWarning("ItemController component not found!");
         }
     }
 
@@ -66,7 +54,7 @@ public class PlayerCapacity : MonoBehaviour
     {
         debugCurrentLoad = GetCurrentLoad();
         debugRemainingSpace = GetRemainingEquipSpace();
-        debugLoadPercentage = maxEquipLoad > 0 ? (debugCurrentLoad / maxEquipLoad) * 100f : 0f;
+        debugLoadPercentage = (debugCurrentLoad / maxEquipLoad) * 100f;
     }
 
     /// <summary>
@@ -132,28 +120,12 @@ public class PlayerCapacity : MonoBehaviour
     }
 
     /// <summary>
-    /// Lấy current load từ weapon, armor và items
+    /// Lấy current load từ weaponController
     /// </summary>
     public float GetCurrentLoad()
     {
-        float total = 0f;
-
-        if (weaponController != null)
-        {
-            total += weaponController.GetCurrentEquipLoad(); // Hiện tại chỉ weapon weight
-        }
-
-        if (armorController != null)
-        {
-            total += armorController.GetTotalArmorWeight();
-        }
-
-        if (itemController != null)
-        {
-            total += itemController.GetCurrentItemLoad(); // Thêm item weight
-        }
-
-        return total;
+        if (weaponController == null) return 0f;
+        return weaponController.GetCurrentEquipLoad();
     }
 
     /// <summary>
@@ -162,7 +134,9 @@ public class PlayerCapacity : MonoBehaviour
     /// </summary>
     public float GetRemainingEquipSpace()
     {
-        float currentLoad = GetCurrentLoad();
+        if (weaponController == null) return maxEquipLoad;
+
+        float currentLoad = weaponController.GetCurrentEquipLoad();
         float remaining = maxEquipLoad - currentLoad;
 
         return remaining; // Cho phép âm

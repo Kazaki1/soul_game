@@ -297,173 +297,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 5960244787455364587}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &4618126531097289610
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1456763291432220408}
-  - component: {fileID: 4343849458755076129}
-  - component: {fileID: 5005064352177791842}
-  - component: {fileID: 6489725817676984276}
-  m_Layer: 7
-  m_Name: Spear_Hitbox
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &1456763291432220408
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4618126531097289610}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.007999993, y: -0.1602601, z: 0}
-  m_LocalScale: {x: 0.097336575, y: 0.09437576, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 5960244787455364587}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &4343849458755076129
-SpriteRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4618126531097289610}
-  m_Enabled: 1
-  m_CastShadows: 0
-  m_ReceiveShadows: 0
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 0
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 0
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 0}
-  m_FlipX: 0
-  m_FlipY: 0
-  m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
-  m_AdaptiveModeThreshold: 0.5
-  m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
---- !u!60 &5005064352177791842
-PolygonCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4618126531097289610}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
-    newSize: {x: 1, y: 1}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Points:
-    m_Paths:
-    - - {x: 0.41360018, y: 0.98430866}
-      - {x: -1.3170412, y: 1.0643542}
-      - {x: -1.7239798, y: 1.5183249}
-      - {x: -3.0493126, y: 2.5367618}
-      - {x: -2.247638, y: 0.72043985}
-      - {x: -1.9636167, y: 0.119094566}
-      - {x: -1.7398207, y: -0.45203072}
-      - {x: -1.3791167, y: -1.0391417}
-      - {x: -0.9129343, y: -2.0502758}
-      - {x: -0.028990641, y: -3.771069}
-      - {x: 0.9697853, y: -1.6741294}
-      - {x: 1.6242012, y: -0.47679526}
-      - {x: 2.0060732, y: 0.32414156}
-      - {x: 3.0288196, y: 2.6210358}
-      - {x: 1.5197927, y: 1.1772099}
-  m_UseDelaunayMesh: 0
---- !u!114 &6489725817676984276
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4618126531097289610}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f37bc6319a2a8754690eb60f075de7a8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Melee
-  knockbackForce: 5
 --- !u!1 &5074376515499510225
 GameObject:
   m_ObjectHideFlags: 0
@@ -800,7 +633,6 @@ Transform:
   - {fileID: 371652121664418912}
   - {fileID: 7166309563975139011}
   - {fileID: 7836164350428179308}
-  - {fileID: 1456763291432220408}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0.301, y: 0, z: 0}
 --- !u!212 &8387272748650328565
@@ -850,7 +682,7 @@ SpriteRenderer:
   m_SortingLayerID: 1124911009
   m_SortingLayer: 1
   m_SortingOrder: 0
-  m_Sprite: {fileID: 4708563692262564547, guid: f92ca7fcdc517374eb6ca822d7dcf8fb, type: 3}
+  m_Sprite: {fileID: -7536374363334403809, guid: ca2a27fcb3c6b3242bf3c063a1956869, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -989,7 +821,6 @@ MonoBehaviour:
   weaponHitboxes:
   - {fileID: 1191379644189023389}
   - {fileID: 5074376515499510225}
-  - {fileID: 4618126531097289610}
   defaultAttackCooldown: 0.52
   defaultStaminaCost: 10
   weaponOffsets:
@@ -999,11 +830,6 @@ MonoBehaviour:
     leftOffset: {x: -0.15, y: -0.15}
     rightOffset: {x: 0.15, y: -0.1}
   - weaponTypeName: 1
-    upOffset: {x: -0.04, y: 0.14}
-    downOffset: {x: 0, y: -0.15}
-    leftOffset: {x: -0.13, y: -0.02}
-    rightOffset: {x: 0.13, y: -0.02}
-  - weaponTypeName: 2
     upOffset: {x: -0.04, y: 0.14}
     downOffset: {x: 0, y: -0.15}
     leftOffset: {x: -0.13, y: -0.02}
@@ -1035,15 +861,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStats
   vigor: 1
-  strength: 1
-  dexterity: 1
+  strength: 99
+  dexterity: 99
   intelligence: 1
   endurance: 1
   playerHealth: {fileID: 3614209044715010521}
   stamina: {fileID: 3685627160063065811}
-  playerCapacity: {fileID: 308744195601877323}
-  playerController: {fileID: 6477415114080563631}
-  soulLevel: 5
 --- !u!114 &3685627160063065811
 MonoBehaviour:
   m_ObjectHideFlags: 0

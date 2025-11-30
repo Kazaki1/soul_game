@@ -34,7 +34,7 @@ public class PlayerController : MonoBehaviour
 
     public float dough_cooldown = 1f;
     bool isDoughing = false;
-    bool canDough = true;
+    public bool canDough = true;
     bool isInvincible = false;
 
     private PlayerWeaponController weaponController;
@@ -81,6 +81,10 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (DialogueManager.GetInstance().dialogueIsPlaying)
+        {
+            return;
+        }
         if (!isDoughing)
         {
             Move();
@@ -99,17 +103,31 @@ public class PlayerController : MonoBehaviour
 
         moveDirection = new Vector2(moveX, moveY).normalized;
 
+        if (DialogueManager.GetInstance().dialogueIsPlaying)
+        {
+            isMoving = false;
+            moveDirection = Vector2.zero;
+            return;
+        }
+
         if (moveX != 0f || moveY != 0f)
         {
             isMoving = true;
-            lastMoveDirection = moveDirection;
-
-            Vector3 vector3 = Vector3.left * lastMoveDirection.x + Vector3.down * lastMoveDirection.y;
-            Aim.rotation = Quaternion.LookRotation(Vector3.forward, vector3);
+            if (!DialogueManager.GetInstance().dialogueIsPlaying)
+            {
+                lastMoveDirection = moveDirection;
+                Vector3 vector3 =Vector3.left * lastMoveDirection.x + Vector3.down * lastMoveDirection.y;
+                Aim.rotation = Quaternion.LookRotation(Vector3.forward, vector3);
+            }
         }
         else
         {
             isMoving = false;
+        }
+
+        if (DialogueManager.GetInstance().dialogueIsPlaying)
+        {
+            return;
         }
 
         if (moveDirection != Vector2.zero)
@@ -118,6 +136,11 @@ public class PlayerController : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Space) && canDough)
         {
+            if (DialogueManager.GetInstance().dialogueIsPlaying)
+            {
+                return;
+            }
+            else
             StartCoroutine(Doughing());
         }
 
@@ -130,6 +153,10 @@ public class PlayerController : MonoBehaviour
 
     void Move()
     {
+        if (DialogueManager.GetInstance().dialogueIsPlaying)
+        {
+            return;
+        }
         if (isDoughing)
             return;
 
@@ -138,6 +165,10 @@ public class PlayerController : MonoBehaviour
 
     void Sprint()
     {
+        if (DialogueManager.GetInstance().dialogueIsPlaying)
+        {
+            return;
+        }
         Stamina stamina = FindObjectOfType<Stamina>();
         bool isMoving = Mathf.Abs(moveDirection.x) > 0f || Mathf.Abs(moveDirection.y) > 0f;
 
@@ -173,6 +204,7 @@ public class PlayerController : MonoBehaviour
 
     private IEnumerator Doughing()
     {
+        
         Stamina stamina = FindObjectOfType<Stamina>();
 
         // Update dough stats trước khi dodge

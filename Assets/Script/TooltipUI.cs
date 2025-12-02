@@ -8,7 +8,6 @@ public class TooltipUI : MonoBehaviour
     public GameObject panel;
     public TextMeshProUGUI nameText;
     public TextMeshProUGUI statsText;
-    public TextMeshProUGUI descText;
     private Canvas canvas;
     private RectTransform panelRect;
 
@@ -56,9 +55,9 @@ public class TooltipUI : MonoBehaviour
         }
 
         nameText.text = item.item_name;
-        descText.text = item.description;
         statsText.text = BuildStats(item);
     }
+ 
 
     public void HideTooltip()
     {
@@ -85,8 +84,18 @@ public class TooltipUI : MonoBehaviour
                 if (item.weaponPrefab != null)
                 {
                     WeaponStats weaponStats = item.weaponPrefab.GetComponent<WeaponStats>();
+
                     if (weaponStats != null)
-                        stats += $"<b>Weight:</b> {weaponStats.GetWeaponWeight():F1}\n";
+                    {
+                        stats += $"<b>Base Damage:</b> {weaponStats.GetBaseDamage()}\n";
+                        var scale = weaponStats.GetScalingLetters();
+
+                        stats += "<b>Scaling:</b>\n";
+                        stats += $"  STR: {scale.str}\n";
+                        stats += $"  DEX: {scale.dex}\n";
+                        stats += $"  INT: {scale.intel}\n";
+                    }
+
                 }
                 if (item.weaponAnimator != null)
                     stats += $"<color=yellow>Has Animation</color>\n";

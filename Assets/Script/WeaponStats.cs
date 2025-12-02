@@ -47,4 +47,26 @@ public class WeaponStats : MonoBehaviour
     // Setters - Weight & Type
     public void SetWeaponWeight(float value) => weaponWeight = Mathf.Max(0f, value);
     public void SetWeaponType(int value) => weaponType = Mathf.Max(0, value);
+    // Convert scale float (0–1) → Letter Rank (S, A, B, C, D, E, -)
+    public static string ConvertScale(float value)
+    {
+        if (value >= 0.90f) return "S";
+        if (value >= 0.75f) return "A";
+        if (value >= 0.55f) return "B";
+        if (value >= 0.35f) return "C";
+        if (value >= 0.15f) return "D";
+        if (value > 0f) return "E";
+        return "-";
+    }
+
+    // Convenience method để lấy tất cả scaling dạng chữ
+    public (string str, string dex, string intel) GetScalingLetters()
+    {
+        return (
+            ConvertScale(strScale),
+            ConvertScale(dexScale),
+            ConvertScale(intScale)
+        );
+    }
+
 }

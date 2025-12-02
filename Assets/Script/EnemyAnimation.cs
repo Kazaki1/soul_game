@@ -38,11 +38,11 @@ public class EnemyAnimation : MonoBehaviour
 
     // MEDIUM
     private const float MEDIUM_IDLE = 0f;
-    private const float MEDIUM_WALK = 0.25f;
-    private const float MEDIUM_BLOCK = 0.5f;
-    private const float MEDIUM_SLASH = 0.75f;
-    private const float MEDIUM_SHOOT = 1f;
-
+    private const float MEDIUM_WALK = 0.1666f;
+    private const float MEDIUM_BLOCK = 0.3333f;
+    private const float MEDIUM_SLASH = 0.5f;
+    private const float MEDIUM_SHOOT = 0.6666f;
+    private const float MEDIUM_SPECIAL = 0.8333f;
     // HEAVY
     private const float HEAVY_IDLE = 0f;
     private const float HEAVY_WALK = 0.25f;
@@ -74,14 +74,9 @@ public class EnemyAnimation : MonoBehaviour
     private void HandleFlip()
     {
         float vx = rb.linearVelocity.x;
-
-        // Đang di chuyển → flip theo velocity
         if (Mathf.Abs(vx) > 0.05f)
         {
             bool shouldFaceRight = vx > 0f;
-
-            // Nếu sprite gốc hướng trái: flipX = true khi nhìn phải
-            // Nếu sprite gốc hướng phải: flipX = true khi nhìn trái
             if (spriteDefaultFacingLeft)
             {
                 spriteRenderer.flipX = shouldFaceRight;
@@ -100,6 +95,7 @@ public class EnemyAnimation : MonoBehaviour
     public void SetSlashing(bool active = true) => blendValue = active ? GetBlend("slash") : GetBlend("idle");
     public void SetShooting(bool active = true) => blendValue = active ? GetBlend("shoot") : GetBlend("idle");
     public void SetDashing(bool active = true) => blendValue = active ? GetBlend("dash") : GetBlend("idle");
+    public void SetSpecial(bool active = true) => blendValue = active ? GetBlend("special") : GetBlend("idle");
 
 
     private float GetBlend(string action)
@@ -114,6 +110,7 @@ public class EnemyAnimation : MonoBehaviour
                     "block" => MEDIUM_BLOCK,
                     "slash" => MEDIUM_SLASH,
                     "shoot" => MEDIUM_SHOOT,
+                    "special" => MEDIUM_SPECIAL,
                     _ => MEDIUM_IDLE
                 };
 

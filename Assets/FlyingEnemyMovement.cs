@@ -22,10 +22,6 @@ public class FlyingEnemyMovement : MonoBehaviour
     public float patrolWaitTime = 2f;
     public float patrolDuration = 15f;
 
-    [Header("Alert Settings")]
-    public float alertRange = 20f;              // Bán kính báo động
-    public LayerMask enemyLayer;                // Layer của quái
-
     private Path path;
     private int currentWaypoint = 0;
 
@@ -107,10 +103,7 @@ public class FlyingEnemyMovement : MonoBehaviour
         // === Đuổi theo khi phát hiện ===
         if (playerDistance <= chaseRange)
         {
-            if (!isChasing)
-            {
-                AlertNearbyEnemies(); // Báo động các quái khác
-            }
+            
 
             isChasing = true;
             isPatrolling = false;
@@ -173,34 +166,7 @@ public class FlyingEnemyMovement : MonoBehaviour
         lastVelocity = rb.linearVelocity;
     }
 
-    // === Báo động quái xung quanh ===
-    void AlertNearbyEnemies()
-    {
-        if (hasAlertedOthers) return; // tránh báo động liên tục
-        hasAlertedOthers = true;
-
-        Collider2D[] nearbyEnemies = Physics2D.OverlapCircleAll(transform.position, alertRange, enemyLayer);
-        foreach (Collider2D enemy in nearbyEnemies)
-        {
-            if (enemy.gameObject != this.gameObject)
-            {
-                FlyingEnemyMovement other = enemy.GetComponent<FlyingEnemyMovement>();
-                if (other != null)
-                {
-                    other.AlertToPlayer(player);
-                }
-            }
-        }
-    }
-
-    // === Khi bị báo động ===
-    public void AlertToPlayer(Transform detectedPlayer)
-    {
-        player = detectedPlayer;
-        isChasing = true;
-        isPatrolling = false;
-        isReturning = false;
-    }
+ 
 
     void UpdateAnimationAndDirection()
     {
@@ -230,21 +196,5 @@ public class FlyingEnemyMovement : MonoBehaviour
         isChasing = false;
         isRetreating = false;
         hasAlertedOthers = false;
-    }
-
-    void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, chaseRange);
-
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, retreatRange);
-
-        Gizmos.color = Color.cyan;
-        Vector2 startPos = Application.isPlaying ? startPosition : (Vector2)transform.position;
-        Gizmos.DrawWireSphere(startPos, patrolRadius);
-
-        Gizmos.color = Color.magenta;
-        Gizmos.DrawWireSphere(transform.position, alertRange);
     }
 }

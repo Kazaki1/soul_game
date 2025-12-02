@@ -129,35 +129,38 @@ public class EnemyRangedAttack : MonoBehaviour
     // 🔹 Báo động khi phát hiện player
     void AlertNearbyEnemies()
     {
-        // 1️⃣ Báo cho các quái Ranged khác
-        foreach (var enemy in allRangedEnemies)
-        {
-            if (enemy == null || enemy == this) continue;
-            float dist = Vector2.Distance(transform.position, enemy.transform.position);
-            if (dist <= alertRange)
-                enemy.OnAlerted(player);
-        }
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
 
-        // 2️⃣ Báo cho các quái bay có PathfindingEnemy trong vùng
-        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, alertRange, enemyLayer);
-        foreach (var hit in hits)
+        foreach (var e in enemies)
         {
-            PathfindingEnemy flying = hit.GetComponent<PathfindingEnemy>();
-            if (flying != null)
+            if (e == null || e == gameObject) continue;
+
+            float dist = Vector2.Distance(transform.position, e.transform.position);
+            if (dist > alertRange) continue;
+
+            // Nếu là quái ranged
+            EnemyRangedAttack ranged = e.GetComponent<EnemyRangedAttack>();
+            if (ranged != null)
             {
-                flying.SendMessage("OnAlerted", player, SendMessageOptions.DontRequireReceiver);
+                ranged.OnAlerted(player);
+                continue;
             }
+
+            // Nếu là quái bay hoặc AI khác
+            e.SendMessage("OnAlerted", player, SendMessageOptions.DontRequireReceiver);
         }
 
         Debug.Log($"[{name}] alerted nearby enemies!");
     }
 
+
     public void OnAlerted(Transform detectedPlayer)
     {
-        if (hasDetectedPlayer) return;
-        hasDetectedPlayer = true;
-        player = detectedPlayer;
+        hasDetectedPlayer = true;     // 🔥 Bật trạng thái thấy player
+        player = detectedPlayer;      // 🔥 Gán player
+        nextAttackTime = 0;           // 🔥 Cho phép tấn công ngay lập tức
     }
+
 
     void OnDrawGizmosSelected()
     {

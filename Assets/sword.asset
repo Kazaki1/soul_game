@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Scriptable_object
   item_name: sword
   itemIcon: {fileID: 712035800519618848, guid: b428ed23d008ccc4fbe3a000263ffaa2, type: 3}
-  description: Item description here
+  description: "G\xC2Y S\xC1T TH\u01AF\u01A0NG KH\u1EE6NG"
   itemType: 1
   IsUseableAnywhere: 0
   maxStack: 99
@@ -24,4 +24,5 @@ MonoBehaviour:
   weaponPrefab: {fileID: 305242330218434079, guid: ed83db58e39b7fc42b17850fc83162c3, type: 3}
   weaponAnimator: {fileID: 0}
   dropPrefab: {fileID: 0}
+  slotCategory: 0
   armorTag: 4

@@ -23,9 +23,15 @@ public class ShopItem
         this.price = price;
         description = desc;
         itemType = type;
-        weaponPrefab = prefab;
+        itemPrefab = prefab;
+    }
+    public GameObject WeaponPrefab
+    {
+        get { return itemPrefab; }
+        set { itemPrefab = value; }
     }
 }
+
 
 public enum ShopItemType
 {

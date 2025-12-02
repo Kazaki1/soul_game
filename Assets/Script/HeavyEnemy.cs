@@ -29,6 +29,7 @@ public class HeavyEnemy : MonoBehaviour
     private PathfindingEnemy pathAI;
     private Rigidbody2D rb;
     private EnemyDash dash;
+    private Vector3 originalScale;
 
     void Start()
     {
@@ -37,6 +38,7 @@ public class HeavyEnemy : MonoBehaviour
         ranged = GetComponent<EnemyRangedAttack>();
         pathAI = GetComponent<PathfindingEnemy>();
         dash = GetComponent<EnemyDash>();
+        originalScale = transform.localScale;
 
         anim.enemyType = EnemyAnimation.EnemyType.Heavy;
 
@@ -86,6 +88,8 @@ public class HeavyEnemy : MonoBehaviour
         // DASH
         if (dist <= dashRange && dash != null && dash.CanDash())
         {
+            // flip trước khi dash
+            Flip(player.position.x - transform.position.x);
             StartCoroutine(DoDash());
             return;
         }
@@ -94,16 +98,24 @@ public class HeavyEnemy : MonoBehaviour
         if (dist <= attackRange)
         {
             StopMoving();
+
+            // flip trước khi bắn
+            Flip(player.position.x - transform.position.x);
+
             StartCoroutine(HandleAttack());
             return;
         }
 
-        // CHASE (same as BaseEnemy)
+        // CHASE (giống BaseEnemy)
         Vector2 dir = (player.position - transform.position).normalized;
         rb.linearVelocity = dir * moveSpeed;
 
+        // flip ngay đây — đúng vị trí chuẩn
+        Flip(dir.x);
+
         anim.SetWalking();
     }
+
 
     private IEnumerator HandleAttack()
     {
@@ -124,6 +136,14 @@ public class HeavyEnemy : MonoBehaviour
         yield return new WaitForSeconds(1.0f);
         canShoot = true;
     }
+    private void Flip(float xDir)
+    {
+        if (xDir > 0)
+            transform.localScale = new Vector3(Mathf.Abs(originalScale.x), originalScale.y, originalScale.z);
+        else
+            transform.localScale = new Vector3(-Mathf.Abs(originalScale.x), originalScale.y, originalScale.z);
+    
+}
 
     private IEnumerator DoDash()
     {

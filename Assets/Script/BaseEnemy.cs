@@ -21,6 +21,8 @@ public class BaseEnemy : MonoBehaviour
     protected EnemyAnimation anim;
     private NormalAttack normalAttack;
     private EnemyDefense defense;
+    private float nextAttackTime = 0f;
+    private bool hasDetectedPlayer = false;
 
     protected virtual void Start()
     {
@@ -135,6 +137,19 @@ public class BaseEnemy : MonoBehaviour
         anim.SetIdle();
         isAttacking = false;
     }
+    public void OnAlerted(Transform targetPlayer)
+    {
+  
+        var field = GetType().GetField("player");
+        if (field != null)
+            field.SetValue(this, targetPlayer);
+
+        var field2 = GetType().GetField("hasDetectedPlayer");
+        if (field2 != null)
+            field2.SetValue(this, true);
+        SendMessage("StartChasing", SendMessageOptions.DontRequireReceiver);
+    }
+
 
 
 }

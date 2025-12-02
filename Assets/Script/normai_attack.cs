@@ -32,34 +32,33 @@ public class NormalAttack : MonoBehaviour
     {
         if (Time.time < nextAttackTime || isAttacking) return;
 
-        // Nếu player không trong khoảng range thì bỏ
+        // Tìm player trong range
         Collider2D hitCheck = Physics2D.OverlapCircle(transform.position, range, playerLayer);
         if (hitCheck == null) return;
 
-        nextAttackTime = Time.time + attackCooldown;
-        StartCoroutine(PerformAttackAfterDelay(0.25f, range));
+        PlayerHealth playerHealth = hitCheck.GetComponent<PlayerHealth>();
+        EnemyDamageDeal damage = GetComponent<EnemyDamageDeal>();
+
+        if (playerHealth != null && damage != null)
+        {
+            nextAttackTime = Time.time + attackCooldown;
+            StartCoroutine(PerformAttackAfterDelay(0.25f, playerHealth, damage));
+        }
     }
 
-    private IEnumerator PerformAttackAfterDelay(float delay, float range)
+
+    private IEnumerator PerformAttackAfterDelay(float delay, PlayerHealth playerHealth, EnemyDamageDeal damage)
     {
         isAttacking = true;
-        anim?.SetSlashing(true);
 
         yield return new WaitForSeconds(delay);
 
-        Collider2D hit = Physics2D.OverlapCircle(transform.position, range, playerLayer);
-        if (hit != null)
+        // Sau delay, gây damage cho player
+        if (playerHealth != null && damage != null)
         {
-            PlayerController player = hit.GetComponent<PlayerController>();
-            if (player != null)
-            {
-                player.TakeDamage(attackDamage);
-                Debug.Log($"[{name}] Normal attack hit player for {attackDamage} damage!");
-            }
+            damage.DealDamageTo(playerHealth);
         }
 
-        yield return new WaitForSeconds(0.4f);
-        anim?.SetIdle();
         isAttacking = false;
     }
 

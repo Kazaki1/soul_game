@@ -176,6 +176,7 @@ public class inventory_slot : MonoBehaviour, IPointerClickHandler, IPointerEnter
         TooltipUI.Instance?.HideTooltip();
     }
   void Update()
+
     {
         if (isPointerOver && Input.GetKeyDown(KeyCode.F))
             Inventory_mananegment.Instance.DeleteHoveredItem();

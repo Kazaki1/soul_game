@@ -40,7 +40,7 @@ MonoBehaviour:
     price: 100
     description: "T\u0103ng 10 s\xE1t th\u01B0\u01A1ng"
     itemType: 1
-    weaponPrefab: {fileID: 6748977131535330673, guid: 8cffb6376324b264b8c5de97557985f7, type: 3}
+    weaponPrefab: {fileID: 770136187578355082, guid: 7c5bcc6381fb7ad4789e3676e8bfbdf2, type: 3}
     healthRestore: 50
     attackBonus: 0
     defenseBonus: 0

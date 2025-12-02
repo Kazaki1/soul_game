@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class EnemyHealth : MonoBehaviour
 {
@@ -13,6 +13,11 @@ public class EnemyHealth : MonoBehaviour
     }
     public void TakeDamage(int damage)
     {
+        EnemyDefense defense = GetComponent<EnemyDefense>();
+        if (defense != null)
+        {
+            damage = defense.ModifyDamage(damage);
+        }
         currentHealth -= damage;
         if (currentHealth <= 0)
         {

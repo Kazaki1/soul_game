@@ -3,52 +3,98 @@ using TMPro;
 
 public class Item : MonoBehaviour
 {
+    [Header("Dữ liệu item")]
     public Scriptable_object itemData;
-    public GameObject pickupHintPrefab; // Prefab trong Canvas
+
+    [Header("Pickup Hint (Optional)")]
+    public GameObject pickupHintPrefab;   // KHÔNG bắt buộc phải có
     private GameObject pickupHintInstance;
+
     private Transform player;
     private bool isPlayerNear = false;
     private Canvas mainCanvas;
 
     private void Start()
     {
-        player = GameObject.FindGameObjectWithTag("Player").transform;
-        mainCanvas = FindObjectOfType<Canvas>(); // tìm Canvas chính
+        player = GameObject.FindGameObjectWithTag("Player")?.transform;
+        if (player == null) return;
 
+        // Nếu có gán hint thì mới tạo
+        if (pickupHintPrefab != null)
+        {
+            mainCanvas = FindObjectOfType<Canvas>();
 
-        // Tạo hint trong Canvas (đảm bảo hiển thị được)
-        pickupHintInstance = Instantiate(pickupHintPrefab, mainCanvas.transform);
-        pickupHintInstance.SetActive(false);
+            if (mainCanvas != null)
+            {
+                pickupHintInstance = Instantiate(pickupHintPrefab, mainCanvas.transform);
+                pickupHintInstance.SetActive(false);
+            }
+        }
     }
 
     private void Update()
     {
-        if (player == null || pickupHintInstance == null) return;
+        if (player == null || itemData == null) return;
 
         float distance = Vector2.Distance(transform.position, player.position);
+
         if (distance < 1.5f)
         {
             if (!isPlayerNear)
             {
                 isPlayerNear = true;
-                pickupHintInstance.SetActive(true);
-                Debug.Log($"📍 {name}: Player tới gần, hiển thị gợi ý");
+
+                if (pickupHintInstance != null)
+                    pickupHintInstance.SetActive(true);
             }
 
-            // Cập nhật vị trí UI hint theo item (chuyển từ world sang screen)
-            Vector3 screenPos = Camera.main.WorldToScreenPoint(transform.position + Vector3.up * 1.5f);
-            pickupHintInstance.transform.position = screenPos;
+            // Cập nhật vị trí UI hint theo item
+            if (pickupHintInstance != null)
+            {
+                Vector3 screenPos = Camera.main.WorldToScreenPoint(transform.position + Vector3.up * 1.5f);
+                pickupHintInstance.transform.position = screenPos;
+            }
+
+            // Nhấn E để nhặt item
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                Pickup();
+            }
         }
-        else if (isPlayerNear)
+        else
         {
-            isPlayerNear = false;
-            pickupHintInstance.SetActive(false);
-            Debug.Log($"🚫 {name}: Player rời xa, ẩn gợi ý");
+            if (isPlayerNear)
+            {
+                isPlayerNear = false;
+
+                if (pickupHintInstance != null)
+                    pickupHintInstance.SetActive(false);
+            }
+        }
+    }
+
+    private void Pickup()
+    {
+        if (itemData == null) return;
+
+        Inventory_mananegment inv = Inventory_mananegment.Instance;
+        if (inv == null) return;
+
+        bool added = inv.Add(itemData);
+        if (added)
+        {
+            Debug.Log($"✅ Đã nhặt item '{itemData.item_name}'");
+            Destroy(gameObject);
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ Inventory đầy, không thể nhặt item");
         }
     }
 
     private void OnDestroy()
     {
+        // Xóa hint nếu có
         if (pickupHintInstance != null)
             Destroy(pickupHintInstance);
     }

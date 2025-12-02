@@ -197,6 +197,7 @@ public class Inventory_mananegment : MonoBehaviour
             bool equipped = invFunc.equip_item(item);
             if (!equipped)
             {
+                Debug.Log("chưa euqip được");
                 return;
             }
         }
@@ -309,91 +310,7 @@ public class Inventory_mananegment : MonoBehaviour
         Canvas.ForceUpdateCanvases();
     }
 
-    public void DropItemFromSlot(inventory_slot slot)
-    {
-        if (slot == null || slot.IsEmpty()) return;
-
-        Scriptable_object item = slot.GetItem();
-        if (slot.isSpecialSlot && (slot == leftHandSlot || slot == rightHandSlot))
-        {
-            DropEquippedWeaponNew(slot);
-            return;
-        }
-
-        Vector3 dropPos = GetDropPosition();
-        GameObject droppedObject = null;
-
-        if (item.itemType == ItemType.Weapon && item.weaponPrefab != null)
-        {
-            droppedObject = Instantiate(item.weaponPrefab, dropPos, Quaternion.identity);
-        }
-        else if (dropPrefab != null)
-        {
-            droppedObject = Instantiate(dropPrefab, dropPos, Quaternion.identity);
-            ItemPickup pickup = droppedObject.GetComponent<ItemPickup>();
-            if (pickup != null) pickup.item = item;
-            SpriteRenderer sr = droppedObject.GetComponent<SpriteRenderer>();
-            if (sr != null && item.itemIcon != null) sr.sprite = item.itemIcon;
-        }
-        else return;
-
-        Rigidbody2D rb = droppedObject.GetComponent<Rigidbody2D>();
-        if (rb != null)
-        {
-            Vector2 dropDirection = GetPlayerFacingDirection();
-            rb.AddForce(dropDirection * dropForce, ForceMode2D.Impulse);
-        }
-
-        slot.ClearSlot();
-        slot.RefreshSlot();
-    }
-
-    private void DropEquippedWeaponNew(inventory_slot weaponSlot)
-    {
-        if (weaponSlot == null || weaponSlot.IsEmpty()) return;
-
-        Scriptable_object item = weaponSlot.GetItem();
-        if (item.weaponPrefab == null) return;
-
-        Vector3 dropPos = GetDropPosition();
-        GameObject dropped = Instantiate(item.weaponPrefab, dropPos, Quaternion.identity);
-
-        Rigidbody2D rb = dropped.GetComponent<Rigidbody2D>();
-        if (rb != null)
-        {
-            Vector2 dropDirection = GetPlayerFacingDirection();
-            rb.AddForce(dropDirection * dropForce, ForceMode2D.Impulse);
-        }
-
-        weaponSlot.ClearSlot();
-        weaponSlot.RefreshSlot();
-
-        PlayerWeaponController pwc = FindObjectOfType<PlayerWeaponController>();
-        if (pwc != null) pwc.UnequipWeapon();
-    }
-
-    private Vector3 GetDropPosition()
-    {
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null)
-        {
-            Vector3 direction = (Vector3)GetPlayerFacingDirection();
-            return player.transform.position + direction * dropDistance + Vector3.up * 0.5f;
-        }
-        return Vector3.zero;
-    }
-
-    private Vector2 GetPlayerFacingDirection()
-    {
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null)
-        {
-            SpriteRenderer sr = player.GetComponent<SpriteRenderer>();
-            if (sr != null) return sr.flipX ? Vector2.left : Vector2.right;
-            return Vector2.right;
-        }
-        return Vector2.right;
-    }
+  
 
     public void SetHoveredSlot(inventory_slot slot)
     {
@@ -444,14 +361,41 @@ public class Inventory_mananegment : MonoBehaviour
 
     public bool AddItemFromShop(ShopItem shopItem)
     {
-        if (shopItem == null) return false;
+        Scriptable_object newItem = ConvertShopItemToInventoryItem(shopItem);
+        if (newItem == null) return false;
+
+        return Add(newItem); // Thêm vào inventory như bình thường
+    }
+
+    public Scriptable_object ConvertShopItemToInventoryItem(ShopItem shopItem)
+    {
+        if (shopItem == null) return null;
 
         Scriptable_object newItem = ScriptableObject.CreateInstance<Scriptable_object>();
+
+        // ⭐ Thông tin cơ bản
         newItem.item_name = shopItem.itemName;
         newItem.itemIcon = shopItem.itemIcon;
+        newItem.description = shopItem.description;
         newItem.itemType = shopItem.itemType;
 
-        return Add(newItem);
+        // ⭐ Prefabs & Animator
+        newItem.weaponPrefab = shopItem.weaponPrefab;
+        newItem.dropPrefab = shopItem.itemPrefab; // nếu ShopItem có itemPrefab
+                                                  // Nếu ShopItem có RuntimeAnimatorController
+                                                  // newItem.weaponAnimator = shopItem.weaponAnimator;
+
+        // ⭐ Stats
+        newItem.healAmount = shopItem.healthRestore;
+        newItem.damage = shopItem.attackBonus;
+        newItem.defense = shopItem.defenseBonus;
+
+        // ⭐ Slot / Armor info
+        // Nếu bạn muốn mặc định slotCategory & armorTag
+        newItem.slotCategory = SlotCategory.NormalBag; // hoặc PotionSlot / BuffSlot tùy itemType
+        newItem.armorTag = ArmorTag.none;
+
+        return newItem;
     }
 
     private void MoveBuffToSpecialSlot(inventory_slot fromSlot, Scriptable_object item)

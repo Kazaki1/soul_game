@@ -6,31 +6,32 @@ using Pathfinding;
 public class PathfindingEnemy : MonoBehaviour
 {
     [Header("Target Settings")]
+    [Tooltip("Để trống - Tự động tìm Player")]
     public Transform player;
 
     [Header("Movement Settings")]
     public float speed = 200f;
     public float nextWaypointDistance = 3f;
     public float chaseRange = 20f;
-    public LayerMask obstacleMask;   
+    public LayerMask obstacleMask;
 
     [Header("Patrol Settings")]
-    public float patrolRadius = 10f;  
-    public float patrolWaitTime = 2f; 
-    public float patrolDuration = 10f; 
+    public float patrolRadius = 10f;
+    public float patrolWaitTime = 2f;
+    public float patrolDuration = 10f;
 
     private Path path;
     private int currentWaypoint = 0;
     private bool reachedEndOfPath = false;
-    private bool isChasing = false; 
-    private bool isPatrolling = false; 
+    private bool isChasing = false;
+    private bool isPatrolling = false;
     private bool isReturning = false;
 
     private Vector2 startPosition;
-    private Vector2 lastKnownPosition; 
-    private Vector2 currentPatrolTarget; 
+    private Vector2 lastKnownPosition;
+    private Vector2 currentPatrolTarget;
     private float patrolWaitTimer = 0f;
-    private float totalPatrolTime = 0f; 
+    private float totalPatrolTime = 0f;
 
     private Seeker seeker;
     private Rigidbody2D rb;
@@ -39,7 +40,22 @@ public class PathfindingEnemy : MonoBehaviour
     {
         seeker = GetComponent<Seeker>();
         rb = GetComponent<Rigidbody2D>();
-        startPosition = rb.position; 
+        startPosition = rb.position;
+
+        // ← TỰ ĐỘNG TÌM PLAYER
+        if (player == null)
+        {
+            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+            if (playerObj != null)
+            {
+                player = playerObj.transform;
+            }
+            else
+            {
+                Debug.LogError($"❌ [{gameObject.name}] Player not found! Make sure Player has 'Player' tag.");
+            }
+        }
+
         InvokeRepeating("UpdatePath", 0f, 0.5f);
     }
 
@@ -83,7 +99,6 @@ public class PathfindingEnemy : MonoBehaviour
         {
             if (isChasing)
             {
-
                 lastKnownPosition = player.position;
                 isChasing = false;
                 isPatrolling = true;
@@ -117,7 +132,7 @@ public class PathfindingEnemy : MonoBehaviour
         {
             Vector2 dirToPlayer = (player.position - transform.position).normalized;
             RaycastHit2D hit = Physics2D.Raycast(transform.position, dirToPlayer, chaseRange, obstacleMask);
-    
+
             if (hit.collider != null && hit.collider.CompareTag("Player"))
             {
                 isChasing = true;
@@ -200,10 +215,10 @@ public class PathfindingEnemy : MonoBehaviour
 
     void SetRandomPatrolPoint()
     {
-
         Vector2 randomDir = Random.insideUnitCircle * patrolRadius;
         currentPatrolTarget = lastKnownPosition + randomDir;
     }
+
     void HandleReturn()
     {
         if (path == null) return;

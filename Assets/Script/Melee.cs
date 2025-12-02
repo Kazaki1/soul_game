@@ -7,13 +7,12 @@ public class Melee : MonoBehaviour
 
     private Transform player;
     private PlayerWeaponController weaponController;
-    private ItemController itemController; // Thêm reference đến ItemController
+    private ItemController itemController; 
 
     private void Start()
     {
         player = transform.root;
 
-        // Lấy PlayerWeaponController và ItemController từ root (Player)
         weaponController = player.GetComponent<PlayerWeaponController>();
         itemController = player.GetComponent<ItemController>();
 
@@ -35,10 +34,8 @@ public class Melee : MonoBehaviour
             EnemyHealth enemyHealth = other.GetComponent<EnemyHealth>();
             EnemyKnockback enemyKB = other.GetComponent<EnemyKnockback>();
 
-            // Lấy damage từ weapon
             float finalDamage = CalculateFinalDamage();
 
-            // Debug log damage
             Debug.Log($"[MELEE] Hit {other.name} for {finalDamage:F1} damage!");
 
             if (enemyHealth != null)
@@ -54,9 +51,6 @@ public class Melee : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Tính final damage với buff từ items
-    /// </summary>
     private float CalculateFinalDamage()
     {
         if (weaponController == null || !weaponController.HasWeapon())
@@ -67,7 +61,6 @@ public class Melee : MonoBehaviour
 
         float weaponDamage = weaponController.GetWeaponDamage();
 
-        // Áp dụng damage buff từ items
         float buffMultiplier = 1f;
         if (itemController != null)
         {
@@ -76,8 +69,6 @@ public class Melee : MonoBehaviour
         }
 
         float finalDamage = weaponDamage * buffMultiplier;
-
-        Debug.Log($"[MELEE] Weapon Damage: {weaponDamage:F1} | Buff Multiplier: {buffMultiplier:F2} | Final: {finalDamage:F1}");
         return finalDamage;
     }
 }

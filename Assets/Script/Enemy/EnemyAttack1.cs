@@ -54,7 +54,6 @@ public class EnemyAttack1 : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        // Sử dụng EnemyDamageDeal để gây damage
         if (damageDeal != null)
         {
             damageDeal.DealDamageOnCollision(collision);

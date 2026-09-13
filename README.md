@@ -55,5 +55,4 @@ A 2D top-down action-RPG built in Unity, inspired by the Souls-like genre — co
 - Currency and item buff system
 - Visual Novel intro powered by Ink
 - Scene transition and Audio system
-3.
-<img width="1001" height="525" alt="image" src="https://github.com/user-attachments/assets/88f3c448-ce8f-4383-88bd-874596310cc7" />
+

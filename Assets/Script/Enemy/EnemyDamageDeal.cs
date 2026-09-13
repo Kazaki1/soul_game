@@ -13,11 +13,8 @@ public class EnemyDamageDeal : MonoBehaviour
     [SerializeField] private float lastPlayerDefense;
     [SerializeField] private int lastFinalDamage;
 
-    /// <summary>
     /// Tính toán damage dựa trên: (Base Damage + % Player Max HP) - Defense Reduction
     /// Formula: total_damage = totalDamage - (totalDamage * (PlayerDefend/20) / 100)
-    /// 20 Defense = 1% reduction
-    /// </summary>
     public int CalculateDamage(PlayerHealth playerHealth, PlayerDefend playerDefend = null)
     {
         if (playerHealth == null)
@@ -26,16 +23,10 @@ public class EnemyDamageDeal : MonoBehaviour
             return baseDamage;
         }
 
-        // Lấy max HP của player
         int playerMaxHP = playerHealth.GetMaxHealth();
-
-        // Tính % damage
         int percentageDamage = Mathf.RoundToInt(playerMaxHP * playerHpPercentage);
-
-        // Tổng damage trước khi trừ defense
         int totalDamage = baseDamage + percentageDamage;
 
-        // Áp dụng defense reduction
         int finalDamage = totalDamage;
         float defenseValue = 0f;
 
@@ -45,17 +36,15 @@ public class EnemyDamageDeal : MonoBehaviour
 
             // Formula: Reduction% = (PlayerDefend / 20) / 100
             // Example: 20 Defense = (20/20)/100 = 0.01 = 1%
-            //          40 Defense = (40/20)/100 = 0.02 = 2%
-            //          100 Defense = (100/20)/100 = 0.05 = 5%
+            
             float reductionPercentage = (defenseValue / 20f) / 100f;
             float damageReduction = totalDamage * reductionPercentage;
             finalDamage = Mathf.CeilToInt(totalDamage - damageReduction);
 
-            // Đảm bảo damage tối thiểu là 1
             finalDamage = Mathf.Max(1, finalDamage);
         }
 
-        // Cache để debug
+        // debug check
         lastBaseDamage = baseDamage;
         lastPercentageDamage = percentageDamage;
         lastCalculatedDamage = totalDamage;
@@ -63,28 +52,21 @@ public class EnemyDamageDeal : MonoBehaviour
         lastFinalDamage = finalDamage;
 
         float reductionPercent = (defenseValue / 20f);
-        Debug.Log($"⚔️ Enemy Damage: {totalDamage} - Defense: {defenseValue:F1} ({reductionPercent:F2}%) → Final: {finalDamage}");
+        Debug.Log($"Enemy Damage: {totalDamage} - Defense: {defenseValue:F1} ({reductionPercent:F2}%) → Final: {finalDamage}");
 
         return finalDamage;
     }
 
-    /// <summary>
-    /// Gây damage cho player (gọi hàm này khi enemy attack hit)
-    /// </summary>
     public void DealDamageTo(PlayerHealth playerHealth)
     {
         if (playerHealth == null) return;
 
-        // Lấy PlayerDefend component
         PlayerDefend playerDefend = playerHealth.GetComponent<PlayerDefend>();
 
         int damage = CalculateDamage(playerHealth, playerDefend);
         playerHealth.TakeDamage(damage);
     }
 
-    /// <summary>
-    /// Gây damage cho player thông qua collision
-    /// </summary>
     public void DealDamageOnCollision(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Player"))
@@ -97,19 +79,14 @@ public class EnemyDamageDeal : MonoBehaviour
         }
     }
 
-    // Getters
     public int GetBaseDamage() => baseDamage;
     public float GetPlayerHpPercentage() => playerHpPercentage;
     public int GetLastCalculatedDamage() => lastCalculatedDamage;
     public int GetLastFinalDamage() => lastFinalDamage;
 
-    // Setters
     public void SetBaseDamage(int value) => baseDamage = Mathf.Max(0, value);
     public void SetPlayerHpPercentage(float value) => playerHpPercentage = Mathf.Clamp01(value);
 
-    /// <summary>
-    /// Hiển thị thông tin damage trong console
-    /// </summary>
     public void DisplayDamageInfo(PlayerHealth playerHealth)
     {
         if (playerHealth == null) return;

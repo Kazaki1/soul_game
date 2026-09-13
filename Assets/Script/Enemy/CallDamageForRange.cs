@@ -11,7 +11,7 @@ public class CallDamageForRange : MonoBehaviour
             damageDealer = GetComponent<EnemyDamageDealRange>();
             if (damageDealer == null)
             {
-                Debug.LogError($"❌ EnemyDamageDeal component not found on {gameObject.name}! Please add it.");
+                Debug.LogError($"EnemyDamageDeal component not found on {gameObject.name}! Please add it.");
             }
         }
     }

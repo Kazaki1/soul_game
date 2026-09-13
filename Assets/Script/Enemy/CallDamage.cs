@@ -9,7 +9,7 @@ public class CallDamage : MonoBehaviour
             damageDealer = GetComponent<EnemyDamageDeal>();
             if (damageDealer == null)
             {
-                Debug.LogError($"❌ EnemyDamageDeal component not found on {gameObject.name}! Please add it.");
+                Debug.LogError($"EnemyDamageDeal component not found on {gameObject.name}! Please add it.");
             }
         }
     }
